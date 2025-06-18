@@ -57,70 +57,159 @@
                 window.calculatorApp = calculatorApp;
                 
                 // Expose global functions for HTML onclick handlers
+                const calc = calculatorApp.getCalculator();
+                const display = calculatorApp.getDisplayManager();
+
                 window.appendToDisplay = (value) => {
-                    calculatorApp.getDisplayManager().updateExpression(
-                        calculatorApp.getDisplayManager().getCurrentExpression() + value
-                    );
-                };
-                
-                window.clearDisplay = () => {
-                    calculatorApp.getDisplayManager().clear();
-                };
-                
-                window.deleteLastChar = () => {
-                    const current = calculatorApp.getDisplayManager().getCurrentExpression();
-                    calculatorApp.getDisplayManager().updateExpression(current.slice(0, -1));
-                };
-                
-                window.calculate = () => {
-                    const expression = calculatorApp.getDisplayManager().getCurrentExpression();
-                    if (expression) {
-                        try {
-                            const result = calculatorApp.getCalculator().calculate(expression);
-                            calculatorApp.getDisplayManager().updateResult(result);
-                        } catch (error) {
-                            calculatorApp.getDisplayManager().showError('Error');
-                        }
+                    const expr = calc.appendToExpression(value);
+                    display.updateExpression(expr);
+                    const preview = calc.previewCalculation();
+                    if (preview !== null) {
+                        display.updateResult(preview);
                     }
                 };
-                
+
+                window.appendFunction = (func) => {
+                    const expr = calc.appendFunction(func);
+                    display.updateExpression(expr);
+                    const preview = calc.previewCalculation();
+                    if (preview !== null) {
+                        display.updateResult(preview);
+                    }
+                };
+
+                window.clearDisplay = () => {
+                    calc.clear();
+                    display.clear();
+                };
+
+                window.deleteLastChar = () => {
+                    const expr = calc.deleteLastChar();
+                    display.updateExpression(expr);
+                    const preview = calc.previewCalculation();
+                    if (preview !== null) {
+                        display.updateResult(preview);
+                    }
+                };
+
+                window.calculate = () => {
+                    const result = calc.calculate();
+                    if (result.success) {
+                        display.updateResult(result.result, result.formattedResult);
+                    } else {
+                        display.showError(result.error);
+                    }
+                };
+
+                window.toggleAngleMode = () => {
+                    const mode = calc.toggleAngleMode();
+                    const btn = document.getElementById('angleMode');
+                    if (btn) btn.textContent = mode.toUpperCase();
+                };
+
                 window.setMode = (mode) => {
                     calculatorApp.getModeManager().setMode(mode);
                 };
-                
+
+                // Graph functions
+                const graph = calculatorApp.getGraphRenderer();
+
+                window.plotGraph = () => {
+                    const input = document.getElementById('functionInput');
+                    if (graph && input && input.value) {
+                        try {
+                            graph.addFunction(input.value);
+                        } catch (e) {
+                            display.showError('Invalid function');
+                        }
+                    }
+                };
+
+                window.clearGraph = () => {
+                    if (graph) {
+                        graph.clearFunctions();
+                    }
+                };
+
+                window.zoomIn = () => {
+                    if (graph) graph.zoomIn();
+                };
+
+                window.zoomOut = () => {
+                    if (graph) graph.zoomOut();
+                };
+
+                window.resetZoom = () => {
+                    if (graph) graph.resetView();
+                };
+
+                window.switchGraphTab = (tab) => {
+                    calculatorApp.tabManagers.graph.switchTab(tab);
+                };
+
                 // Statistics functions
                 window.calculateStatistics = () => {
-                    // Placeholder for statistics calculation
-                    console.log('Calculate statistics called');
-                };
-                
-                window.showBoxPlot = () => {
-                    // Placeholder for box plot
-                    console.log('Show box plot called');
-                };
-                
-                window.showHistogram = () => {
-                    // Placeholder for histogram
-                    console.log('Show histogram called');
-                };
-                
-                // Graph functions
-                window.plotGraph = () => {
-                    // Placeholder for plotting graph
-                    console.log('Plot graph called');
-                };
-                
-                window.clearGraph = () => {
-                    if (calculatorApp.getGraphRenderer()) {
-                        calculatorApp.getGraphRenderer().clearFunctions();
+                    const input = document.getElementById('statsInput');
+                    if (input && input.value) {
+                        calculatorApp.handleStatisticsCalculation({ statsInput: input.value });
                     }
-                    console.log('Clear graph called');
                 };
-                
-                // Tab switching functions
+
+                window.calculateRegression = () => {
+                    const xInput = document.getElementById('xValues');
+                    const yInput = document.getElementById('yValues');
+                    if (xInput && yInput) {
+                        calculatorApp.handleRegressionAnalysis({ xValues: xInput.value, yValues: yInput.value });
+                    }
+                };
+
+                window.generateTable = () => {
+                    const f = document.getElementById('tableFunction');
+                    const s = document.getElementById('tableStart');
+                    const e = document.getElementById('tableEnd');
+                    const st = document.getElementById('tableStep');
+                    if (f && s && e && st) {
+                        calculatorApp.handleTableGeneration({
+                            tableFunction: f.value,
+                            tableStart: s.value,
+                            tableEnd: e.value,
+                            tableStep: st.value
+                        });
+                    }
+                };
+
+                window.showHistogram = () => {
+                    const data = calculatorApp.getDataListManager().getList('L1');
+                    if (calculatorApp.statsVisualizer) {
+                        calculatorApp.statsVisualizer.drawHistogram(data);
+                    }
+                };
+
+                window.showBoxPlot = () => {
+                    const data = calculatorApp.getDataListManager().getList('L1');
+                    if (calculatorApp.statsVisualizer) {
+                        calculatorApp.statsVisualizer.drawBoxPlot(data);
+                    }
+                };
+
+                window.calculateTwoVarStats = () => {
+                    console.log('calculateTwoVarStats not implemented');
+                };
+
+                window.showScatterPlot = () => {
+                    console.log('showScatterPlot not implemented');
+                };
+
+                window.calculateDistribution = () => {
+                    console.log('calculateDistribution not implemented');
+                };
+
+                window.performTest = () => {
+                    console.log('performTest not implemented');
+                };
+
                 window.switchStatsTab = (tab) => {
-                    // Placeholder for statistics tab switching
-                    console.log('Switch stats tab called:', tab);
+                    calculatorApp.tabManagers.statistics.switchTab(tab);
                 };
                 
                 console.log('Calculator application initialized successfully');
