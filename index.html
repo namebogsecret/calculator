@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Продвинутый графический калькулятор</title>
+    
+    <!-- CSS Modules -->
+    <link rel="stylesheet" href="src/styles/variables.css">
+    <link rel="stylesheet" href="src/styles/base.css">
+    <link rel="stylesheet" href="src/styles/calculator.css">
+    <link rel="stylesheet" href="src/styles/buttons.css">
+    <link rel="stylesheet" href="src/styles/display.css">
+    <link rel="stylesheet" href="src/styles/modes.css">
+    <link rel="stylesheet" href="src/styles/graphs.css">
+    <link rel="stylesheet" href="src/styles/statistics.css">
+    <link rel="stylesheet" href="src/styles/animations.css">
+    <link rel="stylesheet" href="src/styles/responsive.css">
+</head>
+<body>
+    <div class="calculator-container">
+        <!-- Mode Selector -->
+        <div id="mode-selector-container"></div>
+        
+        <!-- Display Area -->
+        <div id="display-container"></div>
+        
+        <!-- Calculator Content -->
+        <div class="calculator-content">
+            <!-- Graph Container -->
+            <div id="graph-container"></div>
+            
+            <!-- Statistics Container -->
+            <div id="statistics-container"></div>
+            
+            <!-- Calculator Buttons -->
+            <div id="buttons-container"></div>
+        </div>
+    </div>
+
+    <!-- JavaScript Modules -->
+    <script type="module">
+        import { ComponentLoader } from './src/scripts/component-loader.js';
+        import CalculatorApp from './src/scripts/app.js';
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Load all HTML components
+                await ComponentLoader.initializeCalculatorComponents();
+                
+                // Initialize the calculator application
+                const calculatorApp = new CalculatorApp();
+                await calculatorApp.init();
+                
+                // Make it globally accessible for debugging
+                window.calculatorApp = calculatorApp;
+                
+                // Expose global functions for HTML onclick handlers
+                window.appendToDisplay = (value) => {
+                    calculatorApp.getDisplayManager().updateExpression(
+                        calculatorApp.getDisplayManager().getCurrentExpression() + value
+                    );
+                };
+                
+                window.clearDisplay = () => {
+                    calculatorApp.getDisplayManager().clear();
+                };
+                
+                window.deleteLastChar = () => {
+                    const current = calculatorApp.getDisplayManager().getCurrentExpression();
+                    calculatorApp.getDisplayManager().updateExpression(current.slice(0, -1));
+                };
+                
+                window.calculate = () => {
+                    const expression = calculatorApp.getDisplayManager().getCurrentExpression();
+                    if (expression) {
+                        try {
+                            const result = calculatorApp.getCalculator().calculate(expression);
+                            calculatorApp.getDisplayManager().updateResult(result);
+                        } catch (error) {
+                            calculatorApp.getDisplayManager().showError('Error');
+                        }
+                    }
+                };
+                
+                window.setMode = (mode) => {
+                    calculatorApp.getModeManager().setMode(mode);
+                };
+                
+                // Statistics functions
+                window.calculateStatistics = () => {
+                    // Placeholder for statistics calculation
+                    console.log('Calculate statistics called');
+                };
+                
+                window.showBoxPlot = () => {
+                    // Placeholder for box plot
+                    console.log('Show box plot called');
+                };
+                
+                window.showHistogram = () => {
+                    // Placeholder for histogram
+                    console.log('Show histogram called');
+                };
+                
+                // Graph functions
+                window.plotGraph = () => {
+                    // Placeholder for plotting graph
+                    console.log('Plot graph called');
+                };
+                
+                window.clearGraph = () => {
+                    if (calculatorApp.getGraphRenderer()) {
+                        calculatorApp.getGraphRenderer().clearFunctions();
+                    }
+                    console.log('Clear graph called');
+                };
+                
+                // Tab switching functions
+                window.switchStatsTab = (tab) => {
+                    // Placeholder for statistics tab switching
+                    console.log('Switch stats tab called:', tab);
+                };
+                
+                console.log('Calculator application initialized successfully');
+            } catch (error) {
+                console.error('Failed to initialize calculator application:', error);
+                document.body.innerHTML = `
+                    <div style="color: red; text-align: center; padding: 20px;">
+                        <h2>Ошибка загрузки калькулятора</h2>
+                        <p>Произошла ошибка при инициализации приложения.</p>
+                        <p>Подробности в консоли разработчика.</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

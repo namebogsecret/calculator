@@ -1,0 +1,98 @@
+<div class="graph-container" id="graphContainer">
+    <div class="graph-tabs">
+        <button class="tab-btn active" onclick="switchGraphTab('function')">Функции</button>
+        <button class="tab-btn" onclick="switchGraphTab('table')">Таблица</button>
+        <button class="tab-btn" onclick="switchGraphTab('regression')">Регрессия</button>
+        <button class="tab-btn" onclick="switchGraphTab('trace')">Трассировка</button>
+    </div>
+
+    <div class="tab-content active" id="function-tab">
+        <canvas id="graph-canvas"></canvas>
+        <div class="graph-controls">
+            <input type="text" class="graph-input" id="functionInput" placeholder="y = sin(x), x^2, 2*x+1">
+            <button class="graph-btn" onclick="plotGraph()">Построить</button>
+            <button class="graph-btn" onclick="clearGraph()">Очистить</button>
+            <div class="zoom-controls">
+                <button class="graph-btn zoom-btn" onclick="zoomIn()">+</button>
+                <button class="graph-btn zoom-btn" onclick="zoomOut()">−</button>
+                <button class="graph-btn zoom-btn" onclick="resetZoom()">⟲</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content" id="table-tab">
+        <div class="graph-controls">
+            <input type="text" class="graph-input" id="tableFunction" placeholder="f(x) = x^2">
+            <input type="number" class="graph-input" id="tableStart" placeholder="От" value="-5" style="max-width: 100px;">
+            <input type="number" class="graph-input" id="tableEnd" placeholder="До" value="5" style="max-width: 100px;">
+            <input type="number" class="graph-input" id="tableStep" placeholder="Шаг" value="0.5" style="max-width: 100px;">
+            <button class="graph-btn" onclick="generateTable()">Создать</button>
+        </div>
+        <div class="table-container">
+            <table class="value-table" id="valueTable">
+                <thead>
+                    <tr>
+                        <th>x</th>
+                        <th>f(x)</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="tab-content" id="regression-tab">
+        <div class="data-lists" id="dataLists">
+            <div class="data-list">
+                <div class="list-header">L1 (X)</div>
+                <div class="list-values" id="list1"></div>
+            </div>
+            <div class="data-list">
+                <div class="list-header">L2 (Y)</div>
+                <div class="list-values" id="list2"></div>
+            </div>
+        </div>
+        <div class="graph-controls">
+            <input type="text" class="graph-input" id="xValues" placeholder="X: 1,2,3,4,5">
+            <input type="text" class="graph-input" id="yValues" placeholder="Y: 2,4,5,4,5">
+            <select class="regression-select" id="regressionType">
+                <option value="linear">Линейная</option>
+                <option value="quadratic">Квадратичная</option>
+                <option value="exponential">Экспоненциальная</option>
+                <option value="logarithmic">Логарифмическая</option>
+                <option value="power">Степенная</option>
+            </select>
+            <button class="graph-btn" onclick="calculateRegression()">Рассчитать</button>
+        </div>
+        <div class="stats-results" id="regressionResults">
+            <div class="stat-item">
+                <span class="stat-label">Уравнение:</span>
+                <span class="stat-value" id="regEquation">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">R²:</span>
+                <span class="stat-value" id="regR2">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Корреляция r:</span>
+                <span class="stat-value" id="regR">-</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content" id="trace-tab">
+        <div class="stats-results" style="display: block;">
+            <div class="stat-item">
+                <span class="stat-label">Координаты курсора:</span>
+                <span class="stat-value" id="traceCoords">x: 0, y: 0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Значение функции:</span>
+                <span class="stat-value" id="traceValue">-</span>
+            </div>
+            <p style="margin-top: 10px; color: var(--text-secondary);">
+                Используйте мышь для трассировки графика
+            </p>
+        </div>
+    </div>
+</div>

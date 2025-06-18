@@ -1,0 +1,41 @@
+/* Display Area Styles */
+.display {
+    background: linear-gradient(135deg, #000 0%, #0a0a0a 100%);
+    color: var(--text);
+    padding: 24px;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+}
+
+.display::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+    animation: scan 3s linear infinite;
+}
+
+.expression {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    min-height: 24px;
+    letter-spacing: 0.5px;
+}
+
+.result {
+    font-size: 36px;
+    font-weight: 300;
+    letter-spacing: 1px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+}

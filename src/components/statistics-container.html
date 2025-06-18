@@ -1,0 +1,164 @@
+<div class="statistics-container" id="statisticsContainer">
+    <div class="graph-tabs">
+        <button class="tab-btn active" onclick="switchStatsTab('onevar')">1-Var Stats</button>
+        <button class="tab-btn" onclick="switchStatsTab('twovar')">2-Var Stats</button>
+        <button class="tab-btn" onclick="switchStatsTab('distributions')">Распределения</button>
+        <button class="tab-btn" onclick="switchStatsTab('tests')">Тесты</button>
+    </div>
+
+    <div class="tab-content active" id="onevar-tab">
+        <textarea class="stats-input" id="statsInput" placeholder="Введите числа через запятую, пробел или с новой строки&#10;Например: 1, 2, 3, 4, 5"></textarea>
+        <div class="stats-controls">
+            <button class="graph-btn" onclick="calculateStatistics()">Рассчитать</button>
+            <button class="graph-btn" onclick="showHistogram()">Гистограмма</button>
+            <button class="graph-btn" onclick="showBoxPlot()">Box Plot</button>
+        </div>
+        <div class="stats-results" id="statsResults">
+            <div class="stat-item">
+                <span class="stat-label">n (Количество):</span>
+                <span class="stat-value" id="statCount">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">x̄ (Среднее):</span>
+                <span class="stat-value" id="statMean">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Σx:</span>
+                <span class="stat-value" id="statSum">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Σx²:</span>
+                <span class="stat-value" id="statSumSq">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">s (Станд. откл.):</span>
+                <span class="stat-value" id="statStdDev">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">σ (Попул. ст.откл.):</span>
+                <span class="stat-value" id="statPopStdDev">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Минимум:</span>
+                <span class="stat-value" id="statMin">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Q₁:</span>
+                <span class="stat-value" id="statQ1">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Медиана:</span>
+                <span class="stat-value" id="statMedian">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Q₃:</span>
+                <span class="stat-value" id="statQ3">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Максимум:</span>
+                <span class="stat-value" id="statMax">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">IQR:</span>
+                <span class="stat-value" id="statIQR">-</span>
+            </div>
+        </div>
+        <canvas id="stats-chart" style="display: none; margin-top: 15px; width: 100%; height: 300px;"></canvas>
+    </div>
+
+    <div class="tab-content" id="twovar-tab">
+        <div class="stats-controls">
+            <input type="text" class="graph-input" id="xStatsValues" placeholder="X: 1,2,3,4,5">
+            <input type="text" class="graph-input" id="yStatsValues" placeholder="Y: 2,4,5,4,5">
+            <button class="graph-btn" onclick="calculateTwoVarStats()">Рассчитать</button>
+            <button class="graph-btn" onclick="showScatterPlot()">Scatter Plot</button>
+        </div>
+        <div class="stats-results" id="twoVarResults">
+            <div class="stat-item">
+                <span class="stat-label">n:</span>
+                <span class="stat-value" id="twoVarN">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">x̄:</span>
+                <span class="stat-value" id="twoVarMeanX">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">ȳ:</span>
+                <span class="stat-value" id="twoVarMeanY">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Σxy:</span>
+                <span class="stat-value" id="twoVarSumXY">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">r (корреляция):</span>
+                <span class="stat-value" id="twoVarR">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Линия регрессии:</span>
+                <span class="stat-value" id="twoVarRegression">-</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content" id="distributions-tab">
+        <div class="stats-controls">
+            <select class="regression-select" id="distributionType">
+                <option value="normal">Нормальное</option>
+                <option value="binomial">Биномиальное</option>
+                <option value="poisson">Пуассона</option>
+                <option value="exponential">Экспоненциальное</option>
+                <option value="uniform">Равномерное</option>
+            </select>
+            <input type="number" class="graph-input" id="distParam1" placeholder="Параметр 1" style="max-width: 120px;">
+            <input type="number" class="graph-input" id="distParam2" placeholder="Параметр 2" style="max-width: 120px;">
+            <input type="number" class="graph-input" id="distX" placeholder="x" style="max-width: 100px;">
+            <button class="graph-btn" onclick="calculateDistribution()">PDF/CDF</button>
+        </div>
+        <div class="stats-results" id="distributionResults">
+            <div class="stat-item">
+                <span class="stat-label">PDF(x):</span>
+                <span class="stat-value" id="distPDF">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">CDF(x):</span>
+                <span class="stat-value" id="distCDF">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Мат. ожидание:</span>
+                <span class="stat-value" id="distMean">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Дисперсия:</span>
+                <span class="stat-value" id="distVar">-</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content" id="tests-tab">
+        <div class="stats-controls">
+            <select class="regression-select" id="testType">
+                <option value="ttest">T-Test</option>
+                <option value="ztest">Z-Test</option>
+                <option value="chi2">χ² Test</option>
+                <option value="anova">ANOVA</option>
+            </select>
+            <button class="graph-btn" onclick="performTest()">Выполнить тест</button>
+        </div>
+        <textarea class="stats-input" id="testInput" placeholder="Введите данные для теста"></textarea>
+        <div class="stats-results" id="testResults">
+            <div class="stat-item">
+                <span class="stat-label">Статистика:</span>
+                <span class="stat-value" id="testStat">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">p-value:</span>
+                <span class="stat-value" id="testPValue">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Вывод:</span>
+                <span class="stat-value" id="testConclusion">-</span>
+            </div>
+        </div>
+    </div>
+</div>
