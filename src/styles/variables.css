@@ -1,14 +1,46 @@
 /* CSS Custom Properties (Variables) */
 :root {
-    --primary: #3b82f6;
-    --primary-dark: #2563eb;
-    --secondary: #10b981;
-    --danger: #ef4444;
-    --warning: #f59e0b;
-    --dark: #0f172a;
-    --dark-lighter: #1e293b;
-    --dark-light: #334155;
-    --text: #e2e8f0;
-    --text-secondary: #94a3b8;
-    --border: #334155;
+    /* Modern vibrant color palette */
+    --primary: #4F46E5;
+    --primary-light: #6366F1;
+    --primary-dark: #4338CA;
+    --primary-glow: rgba(79, 70, 229, 0.5);
+
+    --secondary: #06B6D4;
+    --secondary-light: #22D3EE;
+    --secondary-dark: #0891B2;
+    --secondary-glow: rgba(6, 182, 212, 0.5);
+
+    --accent: #EC4899;
+    --accent-light: #F472B6;
+    --accent-glow: rgba(236, 72, 153, 0.5);
+
+    --success: #10B981;
+    --success-light: #34D399;
+    --success-glow: rgba(16, 185, 129, 0.5);
+
+    --danger: #EF4444;
+    --danger-dark: #DC2626;
+
+    --warning: #F59E0B;
+    --warning-dark: #D97706;
+
+    /* Dark theme colors */
+    --dark: #0F0F1E;
+    --dark-lighter: #1A1A2E;
+    --dark-light: #252541;
+    --dark-card: rgba(26, 26, 46, 0.95);
+
+    /* Text colors */
+    --text: #F1F5F9;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+
+    /* Border colors */
+    --border: rgba(148, 163, 184, 0.1);
+    --border-light: rgba(148, 163, 184, 0.05);
+
+    /* Glass effect */
+    --glass-bg: rgba(26, 26, 46, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.1);
 }

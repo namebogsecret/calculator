@@ -2,23 +2,27 @@
 .buttons {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
+    gap: 10px;
 }
 
 .btn {
     aspect-ratio: 1.5;
-    min-height: 55px;
+    min-height: 58px;
     font-size: 18px;
-    font-weight: 500;
+    font-weight: 600;
     border: none;
-    border-radius: 12px;
+    border-radius: 14px;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     color: white;
     position: relative;
     overflow: hidden;
     background: var(--dark-light);
-    border: 1px solid transparent;
+    border: 1.5px solid var(--border);
+    box-shadow:
+        0 4px 6px rgba(0, 0, 0, 0.3),
+        0 1px 3px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .btn::before {
@@ -28,9 +32,22 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.1));
+    background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.15) 100%);
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: opacity 0.3s ease;
+}
+
+.btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
 }
 
 .btn:hover::before {
@@ -38,40 +55,113 @@
 }
 
 .btn:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-    border-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow:
+        0 12px 24px rgba(0, 0, 0, 0.4),
+        0 6px 12px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border-color: var(--glass-border);
 }
 
 .btn:active {
-    transform: translateY(0) scale(0.98);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    transform: translateY(0) scale(0.97);
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.3),
+        inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn:active::after {
+    width: 100%;
+    height: 100%;
+    transition: width 0s, height 0s;
 }
 
 /* Button Types */
 .btn-number {
-    background: linear-gradient(135deg, #334155 0%, #475569 100%);
+    background: linear-gradient(135deg, var(--dark-light) 0%, #2D2D4A 100%);
+}
+
+.btn-number:hover {
+    box-shadow:
+        0 12px 24px rgba(79, 70, 229, 0.3),
+        0 6px 12px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .btn-operator {
-    background: linear-gradient(135deg, var(--warning) 0%, #dc2626 100%);
+    background: linear-gradient(135deg, var(--warning) 0%, var(--warning-dark) 100%);
+    box-shadow:
+        0 4px 6px rgba(245, 158, 11, 0.4),
+        0 1px 3px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.btn-operator:hover {
+    box-shadow:
+        0 12px 24px rgba(245, 158, 11, 0.5),
+        0 6px 12px rgba(245, 158, 11, 0.3),
+        0 0 20px rgba(245, 158, 11, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .btn-function {
-    background: linear-gradient(135deg, #475569 0%, #64748b 100%);
+    background: linear-gradient(135deg, var(--dark-light) 0%, #323256 100%);
     font-size: 15px;
+}
+
+.btn-function:hover {
+    box-shadow:
+        0 12px 24px rgba(99, 102, 241, 0.3),
+        0 6px 12px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .btn-special {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    box-shadow:
+        0 4px 6px var(--primary-glow),
+        0 1px 3px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.btn-special:hover {
+    box-shadow:
+        0 12px 24px var(--primary-glow),
+        0 6px 12px var(--primary-glow),
+        0 0 30px var(--primary-glow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .btn-clear {
-    background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+    background: linear-gradient(135deg, var(--danger) 0%, var(--danger-dark) 100%);
+    box-shadow:
+        0 4px 6px rgba(239, 68, 68, 0.4),
+        0 1px 3px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.btn-clear:hover {
+    box-shadow:
+        0 12px 24px rgba(239, 68, 68, 0.5),
+        0 6px 12px rgba(239, 68, 68, 0.3),
+        0 0 20px rgba(239, 68, 68, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .btn-equals {
-    background: linear-gradient(135deg, var(--secondary) 0%, #059669 100%);
+    background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+    box-shadow:
+        0 4px 6px var(--success-glow),
+        0 1px 3px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.btn-equals:hover {
+    box-shadow:
+        0 12px 24px var(--success-glow),
+        0 6px 12px var(--success-glow),
+        0 0 30px var(--success-glow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 /* Scientific Buttons */
