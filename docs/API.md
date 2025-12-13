@@ -8,7 +8,24 @@
 - [Graph Renderer](#graph-renderer) - Построение графиков
 - [Statistics](#statistics) - Статистический анализ
 - [UI Management](#ui-management) - Управление интерфейсом
+- [Additional Modules](#additional-modules) - Дополнительные модули
 - [Utilities](#utilities) - Вспомогательные функции
+
+## Обзор модулей
+
+Калькулятор состоит из 9 основных модулей:
+
+| Модуль | Размер | Описание |
+|--------|--------|----------|
+| app.js | 638 строк | Главный модуль приложения и координация |
+| statistics.js | 715 строк | Статистический анализ и визуализация |
+| ui.js | 663 строки | Управление интерфейсом (8 менеджеров) |
+| graphing.js | 602 строки | Построение и анализ графиков |
+| scientific.js | 490 строк | Научные и математические функции |
+| calculator.js | 335 строк | Базовые вычисления |
+| utils.js | 295 строк | Вспомогательные функции |
+| constants.js | 100 строк | Константы и конфигурация |
+| component-loader.js | 66 строк | Динамическая загрузка компонентов |
 
 ## Calculator
 
@@ -391,11 +408,225 @@ z-тест.
 
 #### Методы
 
-##### `showTab(tabId)`
-Показывает указанную вкладку.
+##### `switchTab(tabName, event)`
+Переключает активную вкладку.
+- **Параметры**:
+  - `tabName` (string) - имя вкладки
+  - `event` (Event) - событие клика
 
-##### `hideTab(tabId)`
-Скрывает указанную вкладку.
+##### `onTabChange(callback)`
+Регистрирует обработчик изменения вкладки.
+
+### Класс `InputHandler`
+Обработка пользовательского ввода.
+
+#### Методы
+
+##### `setInputDisabled(disabled)`
+Включает/отключает обработку ввода.
+
+### Класс `DataListManager`
+Управление списками данных (L1-L6).
+
+#### Методы
+
+##### `setList(name, data)`
+Устанавливает данные в указанный список.
+- **Параметры**:
+  - `name` (string) - имя списка ('L1'-'L6')
+  - `data` (Array<number>) - массив чисел
+
+##### `getList(name)`
+Получает данные из списка.
+- **Возвращает**: Array<number>
+
+##### `clearList(name)`
+Очищает указанный список.
+
+##### `getListsState()`
+Получает состояние всех списков.
+
+### Класс `NotificationManager`
+Система уведомлений.
+
+#### Методы
+
+##### `showSuccess(message)`
+Показывает успешное уведомление.
+
+##### `showError(message)`
+Показывает уведомление об ошибке.
+
+##### `showInfo(message)`
+Показывает информационное уведомление.
+
+### Класс `FormHandler`
+Обработка форм ввода данных.
+
+#### Методы
+
+##### `setFormHandler(formId, callback)`
+Регистрирует обработчик для формы.
+
+### Класс `ResizeHandler`
+Обработка изменения размера окна.
+
+#### Методы
+
+##### `onResize(callback)`
+Регистрирует обработчик изменения размера.
+
+## Additional Modules
+
+### Класс `Matrix` (scientific.js)
+Операции с матрицами.
+
+#### Конструктор
+```javascript
+const matrix = new Matrix([[1, 2], [3, 4]]);
+```
+
+#### Методы
+
+##### `add(otherMatrix)`
+Сложение матриц.
+
+##### `subtract(otherMatrix)`
+Вычитание матриц.
+
+##### `multiply(otherMatrix)`
+Умножение матриц.
+
+##### `transpose()`
+Транспонирование матрицы.
+
+##### `determinant()`
+Вычисление определителя.
+
+##### `inverse()`
+Вычисление обратной матрицы.
+
+### Класс `FinancialFunctions` (scientific.js)
+Финансовые расчеты.
+
+#### Статические методы
+
+##### `compoundInterest(principal, rate, time, n = 1)`
+Сложные проценты.
+- **Параметры**:
+  - `principal` (number) - начальная сумма
+  - `rate` (number) - процентная ставка
+  - `time` (number) - период в годах
+  - `n` (number) - количество начислений в год
+- **Возвращает**: number - итоговая сумма
+
+```javascript
+FinancialFunctions.compoundInterest(1000, 0.05, 10, 12); // ~1647.01
+```
+
+##### `presentValue(futureValue, rate, periods)`
+Приведенная стоимость.
+
+##### `futureValue(presentValue, rate, periods)`
+Будущая стоимость.
+
+##### `annuity(payment, rate, periods)`
+Расчет аннуитета.
+
+##### `amortization(principal, rate, periods)`
+Амортизация кредита.
+
+### Класс `UnitConverter` (scientific.js)
+Конвертация единиц измерения.
+
+#### Статические методы
+
+##### `convert(value, fromUnit, toUnit, category)`
+Конвертирует значение из одной единицы в другую.
+- **Параметры**:
+  - `value` (number) - значение для конвертации
+  - `fromUnit` (string) - исходная единица
+  - `toUnit` (string) - целевая единица
+  - `category` (string) - категория ('length', 'weight', 'temperature', 'volume', 'time', 'speed')
+
+```javascript
+UnitConverter.convert(100, 'cm', 'm', 'length'); // 1
+UnitConverter.convert(32, 'F', 'C', 'temperature'); // 0
+```
+
+##### Поддерживаемые категории:
+- **length**: m, km, cm, mm, mile, yard, foot, inch
+- **weight**: kg, g, mg, ton, pound, ounce
+- **temperature**: C, F, K
+- **volume**: L, mL, gallon, quart, pint, cup
+- **time**: s, min, hour, day, week, year
+- **speed**: m/s, km/h, mph, knot
+
+### Класс `ProbabilityDistributions` (scientific.js)
+Распределения вероятностей.
+
+#### Статические методы
+
+##### `normalPDF(x, mu = 0, sigma = 1)`
+Плотность вероятности нормального распределения.
+
+##### `normalCDF(x, mu = 0, sigma = 1)`
+Функция распределения нормального распределения.
+
+##### `binomialPMF(k, n, p)`
+Вероятностная масса биномиального распределения.
+
+##### `binomialCDF(k, n, p)`
+Функция распределения биномиального распределения.
+
+##### `poissonPMF(k, lambda)`
+Вероятностная масса распределения Пуассона.
+
+##### `poissonCDF(k, lambda)`
+Функция распределения Пуассона.
+
+##### `exponentialPDF(x, lambda)`
+Плотность вероятности экспоненциального распределения.
+
+##### `exponentialCDF(x, lambda)`
+Функция распределения экспоненциального распределения.
+
+```javascript
+// Нормальное распределение
+ProbabilityDistributions.normalPDF(0, 0, 1); // ~0.3989
+ProbabilityDistributions.normalCDF(1.96, 0, 1); // ~0.975
+
+// Биномиальное распределение
+ProbabilityDistributions.binomialPMF(3, 10, 0.3); // ~0.2668
+
+// Пуассона
+ProbabilityDistributions.poissonPMF(2, 3); // ~0.224
+```
+
+### Класс `StatisticalTests` (scientific.js)
+Статистические тесты.
+
+#### Статические методы
+
+##### `tTest(sample, mu = 0, alternative = 'two-sided')`
+Одновыборочный t-тест.
+- **Возвращает**: {statistic: number, pValue: number, df: number}
+
+##### `tTestTwoSample(sample1, sample2, equalVariance = true)`
+Двухвыборочный t-тест.
+
+##### `zTest(sample, mu, sigma)`
+z-тест для известной дисперсии.
+
+##### `chiSquareTest(observed, expected)`
+Тест хи-квадрат.
+
+```javascript
+const data = [12, 15, 18, 20, 22, 25];
+const result = StatisticalTests.tTest(data, 15);
+console.log(`t-статистика: ${result.statistic}`);
+console.log(`p-значение: ${result.pValue}`);
+```
 
 ## Utilities
 
@@ -539,3 +770,60 @@ const points = [{x: 1, y: 2}, {x: 2, y: 4}, {x: 3, y: 6}];
 const regression = RegressionAnalysis.linear(points);
 console.log('Уравнение:', regression.equation); // "y = 2x + 0"
 ```
+
+## Сводка по классам
+
+### Основные модули (9):
+
+**calculator.js** - Базовые вычисления
+- `Calculator` - основной класс калькулятора
+
+**scientific.js** - Научные функции
+- `TrigonometricFunctions` - тригонометрия
+- `LogarithmicFunctions` - логарифмы и степени
+- `ProbabilityDistributions` - распределения вероятностей
+- `StatisticalTests` - статистические тесты
+- `FinancialFunctions` - финансовые функции
+- `Matrix` - матричные операции
+- `UnitConverter` - конвертация единиц
+
+**graphing.js** - Построение графиков
+- `GraphRenderer` - рендеринг графиков
+- `FunctionTable` - таблицы функций
+
+**statistics.js** - Статистический анализ
+- `DescriptiveStatistics` - описательная статистика
+- `RegressionAnalysis` - регрессионный анализ
+- `TwoVariableStatistics` - двумерная статистика
+- `StatisticsVisualizer` - визуализация
+
+**ui.js** - Управление интерфейсом (8 менеджеров)
+- `DisplayManager` - управление дисплеем
+- `ModeManager` - управление режимами
+- `TabManager` - управление вкладками
+- `InputHandler` - обработка ввода
+- `DataListManager` - управление списками данных
+- `NotificationManager` - система уведомлений
+- `FormHandler` - обработка форм
+- `ResizeHandler` - адаптивность
+
+**app.js** - Главное приложение
+- `CalculatorApp` - основной класс приложения
+
+**utils.js** - Вспомогательные функции
+- 15+ утилитарных функций
+
+**constants.js** - Константы и конфигурация
+- Математические константы
+- Конфигурация калькулятора
+- Цветовые схемы
+- Привязки клавиш
+
+**component-loader.js** - Динамическая загрузка
+- `ComponentLoader` - загрузчик HTML компонентов
+
+### Общее количество:
+- **Классов**: 20+
+- **Функций**: 150+
+- **Строк кода**: ~3900
+- **Модулей**: 9
