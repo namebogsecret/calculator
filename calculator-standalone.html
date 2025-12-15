@@ -81,6 +81,23 @@ body::before {
     position: relative;
     z-index: 1;
     animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Fit to screen mode */
+.calculator-container.fit-screen {
+    max-height: calc(100vh - 30px);
+}
+.calculator-container.fit-screen .buttons-container {
+    flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column;
+}
+.calculator-container.fit-screen .buttons,
+.calculator-container.fit-screen .scientific-btns {
+    flex: 1; min-height: 0;
+}
+.calculator-container.fit-screen .btn {
+    aspect-ratio: unset; min-height: 40px; height: 100%;
 }
 
 /* Mode Selector */
@@ -122,6 +139,24 @@ body::before {
     box-shadow: 0 6px 20px var(--primary-glow);
     transform: translateY(-2px);
 }
+
+/* Fit Screen Toggle */
+.fit-screen-toggle {
+    width: 44px; height: 44px; padding: 0;
+    background: transparent; color: var(--text-secondary);
+    border: 1.5px solid var(--border); border-radius: 14px;
+    cursor: pointer; transition: all 0.3s; display: flex;
+    align-items: center; justify-content: center; flex-shrink: 0;
+}
+.fit-screen-toggle:hover {
+    color: var(--text); border-color: var(--glass-border);
+    transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+.fit-screen-toggle.active {
+    background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+    color: white; border-color: var(--success);
+}
+.fit-icon { font-size: 18px; line-height: 1; }
 
 /* Display */
 .display {
@@ -224,7 +259,7 @@ body::before {
 /* Scientific Buttons */
 .scientific-btns {
     display: none;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 8px;
     margin-bottom: 8px;
 }
@@ -442,20 +477,13 @@ body::before {
     to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* Responsive */
-@media (min-width: 600px) {
-    .buttons { grid-template-columns: repeat(5, 1fr); }
-    .scientific-btns { grid-template-columns: repeat(5, 1fr); }
-}
-
+/* Responsive - keep consistent grid columns */
 @media (max-width: 599px) {
-    .calculator-container { border-radius: 0; min-height: 100vh; max-width: 100%; display: flex; flex-direction: column; }
+    .calculator-container { border-radius: 0; max-width: 100%; }
     .mode-btn { min-width: 80px; font-size: 12px; padding: 8px 12px; }
-    .buttons-container { flex: 1; display: flex; flex-direction: column; }
-    .buttons { flex: 1; }
     .display { padding: 20px; min-height: 100px; }
     .result { font-size: 28px; }
-    .btn { min-height: 0; font-size: 16px; }
+    .btn { min-height: 50px; font-size: 16px; }
     .btn-function { font-size: 13px; }
     #graph-canvas { height: 250px; }
 }
@@ -469,6 +497,9 @@ body::before {
             <button class="mode-btn" onclick="setMode('scientific')">Научный</button>
             <button class="mode-btn" onclick="setMode('graph')">Графики</button>
             <button class="mode-btn" onclick="setMode('statistics')">Статистика</button>
+            <button class="fit-screen-toggle" onclick="toggleFitScreen()" title="Подогнать под экран">
+                <span class="fit-icon">⛶</span>
+            </button>
         </div>
 
         <!-- Display Area -->
@@ -735,6 +766,27 @@ body::before {
             case 'statistics':
                 statsContainer.style.display = 'block';
                 break;
+        }
+    }
+
+    // Fit Screen Toggle
+    function toggleFitScreen() {
+        const container = document.querySelector('.calculator-container');
+        const toggle = document.querySelector('.fit-screen-toggle');
+        if (container && toggle) {
+            container.classList.toggle('fit-screen');
+            toggle.classList.toggle('active');
+            localStorage.setItem('fitScreen', container.classList.contains('fit-screen'));
+        }
+    }
+
+    // Restore fit-screen preference
+    if (localStorage.getItem('fitScreen') === 'true') {
+        const container = document.querySelector('.calculator-container');
+        const toggle = document.querySelector('.fit-screen-toggle');
+        if (container && toggle) {
+            container.classList.add('fit-screen');
+            toggle.classList.add('active');
         }
     }
 

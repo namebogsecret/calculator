@@ -111,6 +111,27 @@
                     calculatorApp.getModeManager().setMode(mode);
                 };
 
+                window.toggleFitScreen = () => {
+                    const container = document.querySelector('.calculator-container');
+                    const toggle = document.querySelector('.fit-screen-toggle');
+                    if (container && toggle) {
+                        container.classList.toggle('fit-screen');
+                        toggle.classList.toggle('active');
+                        // Save preference
+                        localStorage.setItem('fitScreen', container.classList.contains('fit-screen'));
+                    }
+                };
+
+                // Restore fit-screen preference
+                if (localStorage.getItem('fitScreen') === 'true') {
+                    const container = document.querySelector('.calculator-container');
+                    const toggle = document.querySelector('.fit-screen-toggle');
+                    if (container && toggle) {
+                        container.classList.add('fit-screen');
+                        toggle.classList.add('active');
+                    }
+                }
+
                 // Graph functions
                 const graph = calculatorApp.getGraphRenderer();
 

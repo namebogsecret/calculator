@@ -61,6 +61,42 @@
     transform: translateY(-2px);
 }
 
+/* Fit Screen Toggle Button */
+.fit-screen-toggle {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.fit-screen-toggle:hover {
+    color: var(--text);
+    border-color: var(--glass-border);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.fit-screen-toggle.active {
+    background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+    color: white;
+    border-color: var(--success);
+    box-shadow: 0 4px 12px var(--success-glow);
+}
+
+.fit-icon {
+    font-size: 18px;
+    line-height: 1;
+}
+
 /* Tab Styles */
 .graph-tabs {
     display: flex;
