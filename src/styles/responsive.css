@@ -1,54 +1,22 @@
 /* Responsive Styles and Media Queries */
 
-/* Desktop Layout - Fixed Layouts */
-@media (min-width: 600px) {
-    .buttons {
-        grid-template-columns: repeat(5, 1fr);
-    }
-    
-    .scientific-btns {
-        grid-template-columns: repeat(5, 1fr);
-    }
-}
-
-@media (min-width: 768px) {
-    .buttons {
-        grid-template-columns: repeat(6, 1fr);
-    }
-    
-    .scientific-btns {
-        grid-template-columns: repeat(6, 1fr);
-    }
-}
+/* Desktop Layout - Fixed Grid Layouts */
+/* Buttons grid should always maintain consistent column count:
+   - .buttons (basic): always 4 columns
+   - .scientific-btns: always 5 columns
+   These are set in buttons.css and should NOT change based on screen width */
 
 /* Mobile Adaptation */
 @media (max-width: 599px) {
     .calculator-container {
         border-radius: 0;
-        min-height: 100vh;
         max-width: 100%;
-        display: flex;
-        flex-direction: column;
     }
 
     .mode-btn {
         min-width: 80px;
         font-size: 12px;
         padding: 8px 12px;
-    }
-
-    .buttons-container {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .buttons {
-        flex: 1;
-    }
-
-    .scientific-btns {
-        margin-bottom: 5px;
     }
 
     .display {
@@ -61,12 +29,16 @@
     }
 
     .btn {
-        min-height: 0;
+        min-height: 50px;
         font-size: 16px;
     }
 
     .btn-function {
         font-size: 13px;
+    }
+
+    .scientific-btns {
+        margin-bottom: 5px;
     }
 
     #graph-canvas {
