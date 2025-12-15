@@ -15,6 +15,33 @@
     max-width: 820px;
     position: relative;
     z-index: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Fit to screen mode - calculator always fits in viewport */
+.calculator-container.fit-screen {
+    max-height: calc(100vh - 30px);
+}
+
+.calculator-container.fit-screen .buttons-container {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.calculator-container.fit-screen .buttons,
+.calculator-container.fit-screen .scientific-btns {
+    flex: 1;
+    min-height: 0;
+}
+
+.calculator-container.fit-screen .btn {
+    aspect-ratio: unset;
+    min-height: 40px;
+    height: 100%;
 }
 
 .calculator-container::before {
