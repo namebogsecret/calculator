@@ -102,17 +102,21 @@
     </div>
 
     <div class="tab-content" id="distributions-tab">
+        <div class="dist-help" style="margin-bottom: 15px; padding: 10px; background: var(--dark); border-radius: 8px; font-size: 12px; color: var(--text-secondary);">
+            <strong>Параметры:</strong>
+            <span id="distHelp">Нормальное: μ (среднее), σ (станд.откл.)</span>
+        </div>
         <div class="stats-controls">
-            <select class="regression-select" id="distributionType">
+            <select class="regression-select" id="distributionType" onchange="updateDistHelp()">
                 <option value="normal">Нормальное</option>
                 <option value="binomial">Биномиальное</option>
                 <option value="poisson">Пуассона</option>
                 <option value="exponential">Экспоненциальное</option>
                 <option value="uniform">Равномерное</option>
             </select>
-            <input type="number" class="graph-input" id="distParam1" placeholder="Параметр 1" style="max-width: 120px;">
-            <input type="number" class="graph-input" id="distParam2" placeholder="Параметр 2" style="max-width: 120px;">
-            <input type="number" class="graph-input" id="distX" placeholder="x" style="max-width: 100px;">
+            <input type="number" class="graph-input" id="distParam1" placeholder="μ = 0" style="max-width: 120px;" step="any">
+            <input type="number" class="graph-input" id="distParam2" placeholder="σ = 1" style="max-width: 120px;" step="any">
+            <input type="number" class="graph-input" id="distX" placeholder="x" style="max-width: 100px;" step="any">
             <button class="graph-btn" onclick="calculateDistribution()">PDF/CDF</button>
         </div>
         <div class="stats-results" id="distributionResults">
@@ -136,8 +140,12 @@
     </div>
 
     <div class="tab-content" id="tests-tab">
+        <div class="test-help" style="margin-bottom: 15px; padding: 10px; background: var(--dark); border-radius: 8px; font-size: 12px; color: var(--text-secondary);">
+            <strong>Формат данных:</strong>
+            <span id="testHelp">T-Test: числа через запятую (тест против μ₀=0)</span>
+        </div>
         <div class="stats-controls">
-            <select class="regression-select" id="testType">
+            <select class="regression-select" id="testType" onchange="updateTestHelp()">
                 <option value="ttest">T-Test</option>
                 <option value="ztest">Z-Test</option>
                 <option value="chi2">χ² Test</option>
@@ -145,7 +153,7 @@
             </select>
             <button class="graph-btn" onclick="performTest()">Выполнить тест</button>
         </div>
-        <textarea class="stats-input" id="testInput" placeholder="Введите данные для теста"></textarea>
+        <textarea class="stats-input" id="testInput" placeholder="Введите числа через запятую: 1, 2, 3, 4, 5"></textarea>
         <div class="stats-results" id="testResults">
             <div class="stat-item">
                 <span class="stat-label">Статистика:</span>
