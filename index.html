@@ -201,36 +201,821 @@
 
                 window.showHistogram = () => {
                     const data = calculatorApp.getDataListManager().getList('L1');
-                    if (calculatorApp.statsVisualizer) {
-                        calculatorApp.statsVisualizer.drawHistogram(data);
+                    if (data.length === 0) {
+                        display.showError('Сначала рассчитайте статистику');
+                        return;
                     }
+
+                    const canvas = document.getElementById('stats-chart');
+                    if (!canvas) return;
+
+                    // Show canvas
+                    canvas.style.display = 'block';
+                    const ctx = canvas.getContext('2d');
+                    const rect = canvas.getBoundingClientRect();
+                    canvas.width = rect.width || 400;
+                    canvas.height = rect.height || 300;
+
+                    // Calculate histogram bins
+                    const bins = Math.min(20, Math.ceil(Math.sqrt(data.length)));
+                    const min = Math.min(...data);
+                    const max = Math.max(...data);
+                    const range = max - min || 1;
+                    const binWidth = range / bins;
+
+                    // Create bins
+                    const binCounts = Array(bins).fill(0);
+                    data.forEach(value => {
+                        const binIndex = Math.min(Math.floor((value - min) / binWidth), bins - 1);
+                        binCounts[binIndex]++;
+                    });
+
+                    const maxCount = Math.max(...binCounts);
+
+                    // Clear canvas
+                    ctx.fillStyle = '#0a0a0a';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    // Draw histogram
+                    const padding = 50;
+                    const chartWidth = canvas.width - 2 * padding;
+                    const chartHeight = canvas.height - 2 * padding;
+                    const barWidth = chartWidth / bins;
+
+                    // Draw bars
+                    ctx.fillStyle = 'rgba(59, 130, 246, 0.7)';
+                    ctx.strokeStyle = '#3b82f6';
+                    ctx.lineWidth = 1;
+
+                    binCounts.forEach((count, i) => {
+                        const barHeight = (count / maxCount) * chartHeight;
+                        const x = padding + i * barWidth;
+                        const y = canvas.height - padding - barHeight;
+
+                        ctx.fillRect(x, y, barWidth - 2, barHeight);
+                        ctx.strokeRect(x, y, barWidth - 2, barHeight);
+                    });
+
+                    // Draw axes
+                    ctx.strokeStyle = '#666';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(padding, padding);
+                    ctx.lineTo(padding, canvas.height - padding);
+                    ctx.lineTo(canvas.width - padding, canvas.height - padding);
+                    ctx.stroke();
+
+                    // X-axis labels
+                    ctx.fillStyle = '#ccc';
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'center';
+
+                    for (let i = 0; i <= 5; i++) {
+                        const value = min + (i * range / 5);
+                        const x = padding + (i * chartWidth / 5);
+                        ctx.fillText(value.toFixed(1), x, canvas.height - padding + 20);
+                    }
+
+                    // Y-axis labels
+                    ctx.textAlign = 'right';
+                    for (let i = 0; i <= 4; i++) {
+                        const value = Math.round((i * maxCount / 4));
+                        const y = canvas.height - padding - (i * chartHeight / 4);
+                        ctx.fillText(value.toString(), padding - 10, y + 4);
+                    }
+
+                    // Title
+                    ctx.textAlign = 'center';
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '14px Arial';
+                    ctx.fillText('Гистограмма', canvas.width / 2, 25);
                 };
 
                 window.showBoxPlot = () => {
                     const data = calculatorApp.getDataListManager().getList('L1');
-                    if (calculatorApp.statsVisualizer) {
-                        calculatorApp.statsVisualizer.drawBoxPlot(data);
+                    if (data.length === 0) {
+                        display.showError('Сначала рассчитайте статистику');
+                        return;
                     }
+
+                    const canvas = document.getElementById('stats-chart');
+                    if (!canvas) return;
+
+                    // Show canvas
+                    canvas.style.display = 'block';
+                    const ctx = canvas.getContext('2d');
+                    const rect = canvas.getBoundingClientRect();
+                    canvas.width = rect.width || 400;
+                    canvas.height = rect.height || 300;
+
+                    // Calculate statistics
+                    const sorted = [...data].sort((a, b) => a - b);
+                    const n = sorted.length;
+                    const min = sorted[0];
+                    const max = sorted[n - 1];
+                    const median = n % 2 === 0 ? (sorted[n/2 - 1] + sorted[n/2]) / 2 : sorted[Math.floor(n/2)];
+                    const q1 = sorted[Math.floor(n * 0.25)];
+                    const q3 = sorted[Math.floor(n * 0.75)];
+                    const iqr = q3 - q1;
+
+                    // Calculate whiskers
+                    const lowerWhisker = Math.max(min, q1 - 1.5 * iqr);
+                    const upperWhisker = Math.min(max, q3 + 1.5 * iqr);
+
+                    // Clear canvas
+                    ctx.fillStyle = '#0a0a0a';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    // Draw box plot
+                    const padding = 60;
+                    const plotY = canvas.height / 2;
+                    const plotHeight = 80;
+
+                    const range = max - min || 1;
+                    const scale = (canvas.width - 2 * padding) / range;
+                    const getX = (value) => padding + (value - min) * scale;
+
+                    // Box
+                    ctx.fillStyle = 'rgba(59, 130, 246, 0.3)';
+                    ctx.fillRect(getX(q1), plotY - plotHeight/2, getX(q3) - getX(q1), plotHeight);
+
+                    ctx.strokeStyle = '#3b82f6';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(getX(q1), plotY - plotHeight/2, getX(q3) - getX(q1), plotHeight);
+
+                    // Median line
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(getX(median), plotY - plotHeight/2);
+                    ctx.lineTo(getX(median), plotY + plotHeight/2);
+                    ctx.stroke();
+
+                    // Whiskers
+                    ctx.strokeStyle = '#3b82f6';
+                    ctx.lineWidth = 2;
+
+                    // Left whisker
+                    ctx.beginPath();
+                    ctx.moveTo(getX(lowerWhisker), plotY);
+                    ctx.lineTo(getX(q1), plotY);
+                    ctx.stroke();
+
+                    // Right whisker
+                    ctx.beginPath();
+                    ctx.moveTo(getX(q3), plotY);
+                    ctx.lineTo(getX(upperWhisker), plotY);
+                    ctx.stroke();
+
+                    // Whisker caps
+                    ctx.beginPath();
+                    ctx.moveTo(getX(lowerWhisker), plotY - 20);
+                    ctx.lineTo(getX(lowerWhisker), plotY + 20);
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.moveTo(getX(upperWhisker), plotY - 20);
+                    ctx.lineTo(getX(upperWhisker), plotY + 20);
+                    ctx.stroke();
+
+                    // Outliers
+                    ctx.fillStyle = '#ef4444';
+                    data.forEach(value => {
+                        if (value < lowerWhisker || value > upperWhisker) {
+                            ctx.beginPath();
+                            ctx.arc(getX(value), plotY, 5, 0, 2 * Math.PI);
+                            ctx.fill();
+                        }
+                    });
+
+                    // Labels
+                    ctx.fillStyle = '#ccc';
+                    ctx.font = '11px Arial';
+                    ctx.textAlign = 'center';
+
+                    const labels = [
+                        { value: min, text: `Min: ${min.toFixed(2)}` },
+                        { value: q1, text: `Q1: ${q1.toFixed(2)}` },
+                        { value: median, text: `Med: ${median.toFixed(2)}` },
+                        { value: q3, text: `Q3: ${q3.toFixed(2)}` },
+                        { value: max, text: `Max: ${max.toFixed(2)}` }
+                    ];
+
+                    labels.forEach(({ value, text }, index) => {
+                        const y = plotY + plotHeight/2 + 20 + (index % 2 === 0 ? 0 : 15);
+                        ctx.fillText(text, getX(value), y);
+                    });
+
+                    // Title
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '14px Arial';
+                    ctx.fillText('Box Plot', canvas.width / 2, 25);
                 };
 
                 window.calculateTwoVarStats = () => {
-                    console.log('calculateTwoVarStats not implemented');
+                    const xInput = document.getElementById('xStatsValues');
+                    const yInput = document.getElementById('yStatsValues');
+                    if (!xInput || !yInput || !xInput.value || !yInput.value) {
+                        display.showError('Введите данные X и Y');
+                        return;
+                    }
+
+                    try {
+                        const xData = xInput.value.split(/[\s,;]+/).map(n => parseFloat(n)).filter(n => !isNaN(n));
+                        const yData = yInput.value.split(/[\s,;]+/).map(n => parseFloat(n)).filter(n => !isNaN(n));
+
+                        if (xData.length !== yData.length || xData.length < 2) {
+                            display.showError('X и Y должны иметь одинаковую длину (мин. 2 точки)');
+                            return;
+                        }
+
+                        // Store in data lists
+                        calculatorApp.getDataListManager().setList('L1', xData);
+                        calculatorApp.getDataListManager().setList('L2', yData);
+
+                        // Calculate statistics
+                        const n = xData.length;
+                        const sumX = xData.reduce((a, b) => a + b, 0);
+                        const sumY = yData.reduce((a, b) => a + b, 0);
+                        const sumXY = xData.reduce((acc, xi, i) => acc + xi * yData[i], 0);
+                        const sumX2 = xData.reduce((acc, xi) => acc + xi * xi, 0);
+                        const sumY2 = yData.reduce((acc, yi) => acc + yi * yi, 0);
+
+                        const meanX = sumX / n;
+                        const meanY = sumY / n;
+
+                        // Correlation coefficient
+                        const r = (n * sumXY - sumX * sumY) /
+                                  Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+
+                        // Linear regression
+                        const a = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+                        const b = (sumY - a * sumX) / n;
+
+                        // Update UI
+                        document.getElementById('twoVarN').textContent = n;
+                        document.getElementById('twoVarMeanX').textContent = meanX.toFixed(6);
+                        document.getElementById('twoVarMeanY').textContent = meanY.toFixed(6);
+                        document.getElementById('twoVarSumXY').textContent = sumXY.toFixed(6);
+                        document.getElementById('twoVarR').textContent = r.toFixed(6);
+                        document.getElementById('twoVarRegression').textContent = `y = ${a.toFixed(4)}x + ${b.toFixed(4)}`;
+
+                        document.getElementById('twoVarResults').style.display = 'block';
+
+                        calculatorApp.notificationManager.showSuccess('Статистика рассчитана');
+                    } catch (e) {
+                        display.showError('Ошибка расчета: ' + e.message);
+                    }
                 };
 
                 window.showScatterPlot = () => {
-                    console.log('showScatterPlot not implemented');
+                    const xData = calculatorApp.getDataListManager().getList('L1');
+                    const yData = calculatorApp.getDataListManager().getList('L2');
+
+                    if (xData.length === 0 || yData.length === 0) {
+                        display.showError('Сначала рассчитайте 2-Var Stats');
+                        return;
+                    }
+
+                    const canvas = document.getElementById('stats-chart');
+                    if (!canvas) return;
+
+                    canvas.style.display = 'block';
+                    const ctx = canvas.getContext('2d');
+                    const rect = canvas.getBoundingClientRect();
+                    canvas.width = rect.width || 400;
+                    canvas.height = rect.height || 300;
+
+                    // Clear canvas
+                    ctx.fillStyle = '#0a0a0a';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    const padding = 50;
+                    const chartWidth = canvas.width - 2 * padding;
+                    const chartHeight = canvas.height - 2 * padding;
+
+                    // Find data bounds
+                    const minX = Math.min(...xData);
+                    const maxX = Math.max(...xData);
+                    const minY = Math.min(...yData);
+                    const maxY = Math.max(...yData);
+
+                    const rangeX = maxX - minX || 1;
+                    const rangeY = maxY - minY || 1;
+
+                    // Scale functions
+                    const scaleX = (x) => padding + ((x - minX) / rangeX) * chartWidth;
+                    const scaleY = (y) => canvas.height - padding - ((y - minY) / rangeY) * chartHeight;
+
+                    // Draw axes
+                    ctx.strokeStyle = '#666';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(padding, padding);
+                    ctx.lineTo(padding, canvas.height - padding);
+                    ctx.lineTo(canvas.width - padding, canvas.height - padding);
+                    ctx.stroke();
+
+                    // Draw axis labels
+                    ctx.fillStyle = '#ccc';
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'center';
+
+                    for (let i = 0; i <= 4; i++) {
+                        const xVal = minX + (i * rangeX / 4);
+                        const yVal = minY + (i * rangeY / 4);
+                        ctx.fillText(xVal.toFixed(1), scaleX(xVal), canvas.height - padding + 20);
+                        ctx.fillText(yVal.toFixed(1), padding - 25, scaleY(yVal) + 4);
+                    }
+
+                    // Draw data points
+                    ctx.fillStyle = '#3b82f6';
+                    for (let i = 0; i < xData.length; i++) {
+                        ctx.beginPath();
+                        ctx.arc(scaleX(xData[i]), scaleY(yData[i]), 6, 0, 2 * Math.PI);
+                        ctx.fill();
+                    }
+
+                    // Draw regression line
+                    const n = xData.length;
+                    const sumX = xData.reduce((a, b) => a + b, 0);
+                    const sumY = yData.reduce((a, b) => a + b, 0);
+                    const sumXY = xData.reduce((acc, xi, i) => acc + xi * yData[i], 0);
+                    const sumX2 = xData.reduce((acc, xi) => acc + xi * xi, 0);
+
+                    const a = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+                    const b = (sumY - a * sumX) / n;
+
+                    ctx.strokeStyle = '#10b981';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(scaleX(minX), scaleY(a * minX + b));
+                    ctx.lineTo(scaleX(maxX), scaleY(a * maxX + b));
+                    ctx.stroke();
+
+                    // Legend
+                    ctx.fillStyle = '#10b981';
+                    ctx.fillRect(canvas.width - 150, 20, 15, 15);
+                    ctx.fillStyle = '#ccc';
+                    ctx.textAlign = 'left';
+                    ctx.fillText(`y = ${a.toFixed(2)}x + ${b.toFixed(2)}`, canvas.width - 130, 32);
                 };
 
                 window.calculateDistribution = () => {
-                    console.log('calculateDistribution not implemented');
+                    const distType = document.getElementById('distributionType').value;
+                    const param1 = parseFloat(document.getElementById('distParam1').value);
+                    const param2 = parseFloat(document.getElementById('distParam2').value);
+                    const x = parseFloat(document.getElementById('distX').value);
+
+                    if (isNaN(x)) {
+                        display.showError('Введите значение x');
+                        return;
+                    }
+
+                    let pdf, cdf, mean, variance;
+
+                    try {
+                        switch (distType) {
+                            case 'normal':
+                                const mu = isNaN(param1) ? 0 : param1;
+                                const sigma = isNaN(param2) ? 1 : param2;
+                                pdf = (1 / (sigma * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * Math.pow((x - mu) / sigma, 2));
+                                // CDF approximation using error function
+                                const z = (x - mu) / (sigma * Math.sqrt(2));
+                                cdf = 0.5 * (1 + erf(z));
+                                mean = mu;
+                                variance = sigma * sigma;
+                                break;
+
+                            case 'binomial':
+                                const n = Math.floor(isNaN(param1) ? 10 : param1);
+                                const p = isNaN(param2) ? 0.5 : param2;
+                                const k = Math.floor(x);
+                                if (k < 0 || k > n) {
+                                    pdf = 0;
+                                } else {
+                                    const comb = factorial(n) / (factorial(k) * factorial(n - k));
+                                    pdf = comb * Math.pow(p, k) * Math.pow(1 - p, n - k);
+                                }
+                                cdf = 0;
+                                for (let i = 0; i <= k; i++) {
+                                    const c = factorial(n) / (factorial(i) * factorial(n - i));
+                                    cdf += c * Math.pow(p, i) * Math.pow(1 - p, n - i);
+                                }
+                                mean = n * p;
+                                variance = n * p * (1 - p);
+                                break;
+
+                            case 'poisson':
+                                const lambda = isNaN(param1) ? 1 : param1;
+                                const pk = Math.floor(x);
+                                if (pk < 0) {
+                                    pdf = 0;
+                                } else {
+                                    pdf = Math.exp(-lambda) * Math.pow(lambda, pk) / factorial(pk);
+                                }
+                                cdf = 0;
+                                for (let i = 0; i <= pk; i++) {
+                                    cdf += Math.exp(-lambda) * Math.pow(lambda, i) / factorial(i);
+                                }
+                                mean = lambda;
+                                variance = lambda;
+                                break;
+
+                            case 'exponential':
+                                const lambdaExp = isNaN(param1) ? 1 : param1;
+                                if (x < 0) {
+                                    pdf = 0;
+                                    cdf = 0;
+                                } else {
+                                    pdf = lambdaExp * Math.exp(-lambdaExp * x);
+                                    cdf = 1 - Math.exp(-lambdaExp * x);
+                                }
+                                mean = 1 / lambdaExp;
+                                variance = 1 / (lambdaExp * lambdaExp);
+                                break;
+
+                            case 'uniform':
+                                const a = isNaN(param1) ? 0 : param1;
+                                const b = isNaN(param2) ? 1 : param2;
+                                if (x < a || x > b) {
+                                    pdf = 0;
+                                } else {
+                                    pdf = 1 / (b - a);
+                                }
+                                if (x < a) {
+                                    cdf = 0;
+                                } else if (x > b) {
+                                    cdf = 1;
+                                } else {
+                                    cdf = (x - a) / (b - a);
+                                }
+                                mean = (a + b) / 2;
+                                variance = Math.pow(b - a, 2) / 12;
+                                break;
+                        }
+
+                        document.getElementById('distPDF').textContent = pdf.toFixed(8);
+                        document.getElementById('distCDF').textContent = cdf.toFixed(8);
+                        document.getElementById('distMean').textContent = mean.toFixed(6);
+                        document.getElementById('distVar').textContent = variance.toFixed(6);
+
+                        document.getElementById('distributionResults').style.display = 'block';
+
+                        calculatorApp.notificationManager.showSuccess('Распределение рассчитано');
+                    } catch (e) {
+                        display.showError('Ошибка расчета: ' + e.message);
+                    }
+
+                    // Helper functions
+                    function erf(x) {
+                        const a1 =  0.254829592;
+                        const a2 = -0.284496736;
+                        const a3 =  1.421413741;
+                        const a4 = -1.453152027;
+                        const a5 =  1.061405429;
+                        const p  =  0.3275911;
+
+                        const sign = x >= 0 ? 1 : -1;
+                        x = Math.abs(x);
+
+                        const t = 1.0 / (1.0 + p * x);
+                        const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+
+                        return sign * y;
+                    }
+
+                    function factorial(n) {
+                        if (n < 0) return NaN;
+                        if (n === 0 || n === 1) return 1;
+                        let result = 1;
+                        for (let i = 2; i <= n; i++) {
+                            result *= i;
+                        }
+                        return result;
+                    }
                 };
 
                 window.performTest = () => {
-                    console.log('performTest not implemented');
+                    const testType = document.getElementById('testType').value;
+                    const input = document.getElementById('testInput').value;
+
+                    if (!input) {
+                        display.showError('Введите данные для теста');
+                        return;
+                    }
+
+                    try {
+                        let result;
+
+                        switch (testType) {
+                            case 'ttest':
+                                const data = input.split(/[\s,;]+/).map(n => parseFloat(n)).filter(n => !isNaN(n));
+                                if (data.length < 2) {
+                                    display.showError('Нужно минимум 2 значения');
+                                    return;
+                                }
+
+                                const n = data.length;
+                                const mean = data.reduce((a, b) => a + b, 0) / n;
+                                const variance = data.reduce((sum, x) => sum + Math.pow(x - mean, 2), 0) / (n - 1);
+                                const stdError = Math.sqrt(variance / n);
+                                const mu0 = 0; // Test against 0
+
+                                const tStat = (mean - mu0) / stdError;
+                                const df = n - 1;
+
+                                // Approximate p-value using t-distribution
+                                const pValue = 2 * (1 - tCDF(Math.abs(tStat), df));
+
+                                result = {
+                                    statistic: tStat,
+                                    pValue: pValue,
+                                    conclusion: pValue < 0.05 ? 'Отклонить H₀ (p < 0.05)' : 'Не отклонять H₀ (p ≥ 0.05)'
+                                };
+                                break;
+
+                            case 'ztest':
+                                const zData = input.split(/[\s,;]+/).map(n => parseFloat(n)).filter(n => !isNaN(n));
+                                if (zData.length < 2) {
+                                    display.showError('Нужно минимум 2 значения');
+                                    return;
+                                }
+
+                                const nZ = zData.length;
+                                const meanZ = zData.reduce((a, b) => a + b, 0) / nZ;
+                                const stdDevZ = Math.sqrt(zData.reduce((sum, x) => sum + Math.pow(x - meanZ, 2), 0) / nZ);
+                                const stdErrorZ = stdDevZ / Math.sqrt(nZ);
+
+                                const zStat = (meanZ - 0) / stdErrorZ;
+                                const pValueZ = 2 * (1 - normalCDF(Math.abs(zStat)));
+
+                                result = {
+                                    statistic: zStat,
+                                    pValue: pValueZ,
+                                    conclusion: pValueZ < 0.05 ? 'Отклонить H₀ (p < 0.05)' : 'Не отклонять H₀ (p ≥ 0.05)'
+                                };
+                                break;
+
+                            case 'chi2':
+                                // Expect observed:expected format or just observed (uniform expected)
+                                const lines = input.trim().split('\n');
+                                let observed, expected;
+
+                                if (lines.length === 2) {
+                                    observed = lines[0].split(/[\s,;]+/).map(n => parseFloat(n)).filter(n => !isNaN(n));
+                                    expected = lines[1].split(/[\s,;]+/).map(n => parseFloat(n)).filter(n => !isNaN(n));
+                                } else {
+                                    observed = lines[0].split(/[\s,;]+/).map(n => parseFloat(n)).filter(n => !isNaN(n));
+                                    const total = observed.reduce((a, b) => a + b, 0);
+                                    expected = observed.map(() => total / observed.length);
+                                }
+
+                                if (observed.length !== expected.length) {
+                                    display.showError('Наблюдаемые и ожидаемые значения должны иметь одинаковую длину');
+                                    return;
+                                }
+
+                                let chiStat = 0;
+                                for (let i = 0; i < observed.length; i++) {
+                                    chiStat += Math.pow(observed[i] - expected[i], 2) / expected[i];
+                                }
+
+                                const dfChi = observed.length - 1;
+                                const pValueChi = 1 - chi2CDF(chiStat, dfChi);
+
+                                result = {
+                                    statistic: chiStat,
+                                    pValue: pValueChi,
+                                    conclusion: pValueChi < 0.05 ? 'Отклонить H₀ (p < 0.05)' : 'Не отклонять H₀ (p ≥ 0.05)'
+                                };
+                                break;
+
+                            case 'anova':
+                                // Each line is a group
+                                const groups = input.trim().split('\n').map(line =>
+                                    line.split(/[\s,;]+/).map(n => parseFloat(n)).filter(n => !isNaN(n))
+                                ).filter(g => g.length > 0);
+
+                                if (groups.length < 2) {
+                                    display.showError('Нужно минимум 2 группы (каждая на новой строке)');
+                                    return;
+                                }
+
+                                // Calculate ANOVA
+                                const allData = groups.flat();
+                                const grandMean = allData.reduce((a, b) => a + b, 0) / allData.length;
+
+                                let ssBetween = 0;
+                                let ssWithin = 0;
+
+                                groups.forEach(group => {
+                                    const groupMean = group.reduce((a, b) => a + b, 0) / group.length;
+                                    ssBetween += group.length * Math.pow(groupMean - grandMean, 2);
+                                    group.forEach(val => {
+                                        ssWithin += Math.pow(val - groupMean, 2);
+                                    });
+                                });
+
+                                const dfBetween = groups.length - 1;
+                                const dfWithin = allData.length - groups.length;
+
+                                const msBetween = ssBetween / dfBetween;
+                                const msWithin = ssWithin / dfWithin;
+
+                                const fStat = msBetween / msWithin;
+                                const pValueF = 1 - fCDF(fStat, dfBetween, dfWithin);
+
+                                result = {
+                                    statistic: fStat,
+                                    pValue: pValueF,
+                                    conclusion: pValueF < 0.05 ? 'Отклонить H₀ (p < 0.05)' : 'Не отклонять H₀ (p ≥ 0.05)'
+                                };
+                                break;
+                        }
+
+                        document.getElementById('testStat').textContent = result.statistic.toFixed(6);
+                        document.getElementById('testPValue').textContent = result.pValue.toFixed(6);
+                        document.getElementById('testConclusion').textContent = result.conclusion;
+
+                        document.getElementById('testResults').style.display = 'block';
+
+                        calculatorApp.notificationManager.showSuccess('Тест выполнен');
+                    } catch (e) {
+                        display.showError('Ошибка: ' + e.message);
+                    }
+
+                    // Helper distribution functions
+                    function normalCDF(x) {
+                        return 0.5 * (1 + erf(x / Math.sqrt(2)));
+                    }
+
+                    function erf(x) {
+                        const a1 =  0.254829592;
+                        const a2 = -0.284496736;
+                        const a3 =  1.421413741;
+                        const a4 = -1.453152027;
+                        const a5 =  1.061405429;
+                        const p  =  0.3275911;
+
+                        const sign = x >= 0 ? 1 : -1;
+                        x = Math.abs(x);
+
+                        const t = 1.0 / (1.0 + p * x);
+                        const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+
+                        return sign * y;
+                    }
+
+                    function tCDF(t, df) {
+                        // Approximation for t-distribution CDF
+                        const x = df / (df + t * t);
+                        return 1 - 0.5 * betaIncomplete(x, df / 2, 0.5);
+                    }
+
+                    function chi2CDF(x, df) {
+                        // Approximation using gamma incomplete
+                        return gammaIncomplete(df / 2, x / 2);
+                    }
+
+                    function fCDF(f, df1, df2) {
+                        // Approximation for F-distribution
+                        const x = df1 * f / (df1 * f + df2);
+                        return betaIncomplete(x, df1 / 2, df2 / 2);
+                    }
+
+                    function gammaIncomplete(a, x) {
+                        // Regularized lower incomplete gamma function approximation
+                        if (x < 0) return 0;
+                        if (x === 0) return 0;
+
+                        let sum = 0;
+                        let term = 1 / a;
+                        sum = term;
+
+                        for (let n = 1; n < 100; n++) {
+                            term *= x / (a + n);
+                            sum += term;
+                            if (Math.abs(term) < 1e-10) break;
+                        }
+
+                        return sum * Math.exp(-x + a * Math.log(x) - logGamma(a));
+                    }
+
+                    function betaIncomplete(x, a, b) {
+                        if (x < 0 || x > 1) return 0;
+                        if (x === 0) return 0;
+                        if (x === 1) return 1;
+
+                        // Continued fraction approximation
+                        const bt = Math.exp(logGamma(a + b) - logGamma(a) - logGamma(b) + a * Math.log(x) + b * Math.log(1 - x));
+
+                        if (x < (a + 1) / (a + b + 2)) {
+                            return bt * betaCF(x, a, b) / a;
+                        } else {
+                            return 1 - bt * betaCF(1 - x, b, a) / b;
+                        }
+                    }
+
+                    function betaCF(x, a, b) {
+                        const maxIterations = 100;
+                        const epsilon = 1e-10;
+
+                        let c = 1;
+                        let d = 1 - (a + b) * x / (a + 1);
+                        if (Math.abs(d) < epsilon) d = epsilon;
+                        d = 1 / d;
+                        let result = d;
+
+                        for (let m = 1; m <= maxIterations; m++) {
+                            const m2 = 2 * m;
+
+                            let aa = m * (b - m) * x / ((a + m2 - 1) * (a + m2));
+                            d = 1 + aa * d;
+                            if (Math.abs(d) < epsilon) d = epsilon;
+                            c = 1 + aa / c;
+                            if (Math.abs(c) < epsilon) c = epsilon;
+                            d = 1 / d;
+                            result *= d * c;
+
+                            aa = -(a + m) * (a + b + m) * x / ((a + m2) * (a + m2 + 1));
+                            d = 1 + aa * d;
+                            if (Math.abs(d) < epsilon) d = epsilon;
+                            c = 1 + aa / c;
+                            if (Math.abs(c) < epsilon) c = epsilon;
+                            d = 1 / d;
+                            const delta = d * c;
+                            result *= delta;
+
+                            if (Math.abs(delta - 1) < epsilon) break;
+                        }
+
+                        return result;
+                    }
+
+                    function logGamma(x) {
+                        // Stirling approximation
+                        const coefficients = [
+                            76.18009172947146,
+                            -86.50532032941677,
+                            24.01409824083091,
+                            -1.231739572450155,
+                            0.1208650973866179e-2,
+                            -0.5395239384953e-5
+                        ];
+
+                        let y = x;
+                        let tmp = x + 5.5;
+                        tmp -= (x + 0.5) * Math.log(tmp);
+                        let ser = 1.000000000190015;
+
+                        for (let j = 0; j < 6; j++) {
+                            ser += coefficients[j] / ++y;
+                        }
+
+                        return -tmp + Math.log(2.5066282746310005 * ser / x);
+                    }
                 };
 
                 window.switchStatsTab = (tab) => {
                     calculatorApp.tabManagers.statistics.switchTab(tab);
+                };
+
+                window.updateDistHelp = () => {
+                    const distType = document.getElementById('distributionType').value;
+                    const helpSpan = document.getElementById('distHelp');
+                    const param1 = document.getElementById('distParam1');
+                    const param2 = document.getElementById('distParam2');
+
+                    const helpTexts = {
+                        normal: { help: 'Нормальное: μ (среднее), σ (станд.откл.)', p1: 'μ = 0', p2: 'σ = 1' },
+                        binomial: { help: 'Биномиальное: n (число испытаний), p (вероятность)', p1: 'n = 10', p2: 'p = 0.5' },
+                        poisson: { help: 'Пуассона: λ (среднее число событий)', p1: 'λ = 1', p2: '(не исп.)' },
+                        exponential: { help: 'Экспоненциальное: λ (интенсивность)', p1: 'λ = 1', p2: '(не исп.)' },
+                        uniform: { help: 'Равномерное: a (мин), b (макс)', p1: 'a = 0', p2: 'b = 1' }
+                    };
+
+                    const info = helpTexts[distType] || helpTexts.normal;
+                    if (helpSpan) helpSpan.textContent = info.help;
+                    if (param1) param1.placeholder = info.p1;
+                    if (param2) param2.placeholder = info.p2;
+                };
+
+                window.updateTestHelp = () => {
+                    const testType = document.getElementById('testType').value;
+                    const helpSpan = document.getElementById('testHelp');
+                    const input = document.getElementById('testInput');
+
+                    const helpTexts = {
+                        ttest: { help: 'T-Test: числа через запятую (тест против μ₀=0)', placeholder: 'Числа через запятую: 1, 2, 3, 4, 5' },
+                        ztest: { help: 'Z-Test: числа через запятую (тест против μ₀=0)', placeholder: 'Числа через запятую: 1, 2, 3, 4, 5' },
+                        chi2: { help: 'χ² Test: наблюд. значения (1 строка) или набл./ожид. (2 строки)', placeholder: 'Наблюдаемые: 10, 20, 30\nОжидаемые: 15, 20, 25' },
+                        anova: { help: 'ANOVA: каждая группа на новой строке', placeholder: 'Группа 1: 1, 2, 3\nГруппа 2: 4, 5, 6\nГруппа 3: 7, 8, 9' }
+                    };
+
+                    const info = helpTexts[testType] || helpTexts.ttest;
+                    if (helpSpan) helpSpan.textContent = info.help;
+                    if (input) input.placeholder = info.placeholder;
                 };
                 
                 console.log('Calculator application initialized successfully');
