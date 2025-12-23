@@ -1,0 +1,351 @@
+/* Matrix Calculator Styles */
+
+.matrix-container {
+    padding: 20px;
+    display: none;
+}
+
+.matrix-container.visible {
+    display: block;
+}
+
+/* Matrix Setup Controls */
+.matrix-setup {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: var(--dark);
+    border-radius: 12px;
+}
+
+.matrix-size-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.matrix-size-controls label {
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.matrix-size-controls input[type="number"] {
+    width: 60px;
+    padding: 8px 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    text-align: center;
+    font-size: 14px;
+}
+
+.matrix-size-controls input[type="number"]:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+.matrix-size-controls span {
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+/* Matrices Wrapper */
+.matrices-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+/* Matrix Input Section */
+.matrix-input-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.matrix-input-section.centered {
+    width: 100%;
+}
+
+.matrix-input-section h4 {
+    color: var(--text);
+    font-weight: 600;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Matrix Grid */
+.matrix-grid {
+    display: inline-grid;
+    gap: 4px;
+    padding: 15px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    position: relative;
+}
+
+.matrix-grid::before,
+.matrix-grid::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    bottom: 5px;
+    width: 4px;
+    background: var(--primary);
+    border-radius: 2px;
+}
+
+.matrix-grid::before {
+    left: 5px;
+}
+
+.matrix-grid::after {
+    right: 5px;
+}
+
+.matrix-grid.result {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+    border-color: var(--success);
+}
+
+.matrix-grid.result::before,
+.matrix-grid.result::after {
+    background: var(--success);
+}
+
+.matrix-grid.augmented {
+    position: relative;
+}
+
+.matrix-grid.augmented::before {
+    left: 5px;
+}
+
+.matrix-grid.augmented::after {
+    right: 5px;
+}
+
+/* Matrix Cell */
+.matrix-cell {
+    width: 55px;
+    height: 40px;
+    padding: 5px;
+    background: var(--dark);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    text-align: center;
+    font-size: 14px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    transition: all 0.2s;
+}
+
+.matrix-cell:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+    background: var(--surface);
+}
+
+.matrix-cell.result-cell {
+    background: var(--dark);
+    border-color: var(--success);
+    color: var(--success);
+    font-weight: 600;
+    cursor: default;
+}
+
+.matrix-cell.augmented-separator {
+    border-left: 3px solid var(--warning);
+    margin-left: 5px;
+}
+
+/* Matrix Quick Actions */
+.matrix-quick-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.graph-btn.small {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+/* Matrix Operations */
+.matrix-operations {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin: 20px 0;
+    padding: 15px;
+    background: var(--dark);
+    border-radius: 12px;
+}
+
+.matrix-operations .graph-btn {
+    min-width: 80px;
+}
+
+.matrix-operations .graph-btn.primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-color: var(--primary-light);
+}
+
+.matrix-operations .graph-btn.primary:hover {
+    box-shadow: 0 4px 15px var(--primary-glow);
+}
+
+/* Scalar Input */
+.scalar-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    margin: 15px 0;
+    padding: 15px;
+    background: var(--surface);
+    border-radius: 8px;
+}
+
+.scalar-input label {
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.scalar-input input {
+    width: 80px;
+    padding: 8px 10px;
+    background: var(--dark);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    text-align: center;
+}
+
+/* Matrix Result Section */
+.matrix-result-section {
+    margin-top: 20px;
+    padding: 20px;
+    background: var(--dark);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.matrix-result-section h4 {
+    color: var(--success);
+    margin-bottom: 15px;
+}
+
+/* Gauss Steps */
+.gauss-steps {
+    margin-top: 20px;
+    padding: 20px;
+    background: var(--dark);
+    border-radius: 12px;
+}
+
+.gauss-steps h4 {
+    color: var(--primary-light);
+    margin-bottom: 15px;
+}
+
+.steps-container {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.gauss-step {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: var(--surface);
+    border-radius: 8px;
+    border-left: 4px solid var(--primary);
+}
+
+.gauss-step .step-description {
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    font-style: italic;
+}
+
+.gauss-step .step-matrix {
+    display: inline-grid;
+    gap: 3px;
+    padding: 10px;
+    background: var(--dark);
+    border-radius: 6px;
+}
+
+.gauss-step .step-cell {
+    width: 50px;
+    padding: 5px;
+    text-align: center;
+    color: var(--text);
+    font-family: monospace;
+    font-size: 12px;
+}
+
+/* System info */
+.system-info {
+    margin: 10px 0;
+    padding: 12px 15px;
+    background: var(--surface);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    border-left: 3px solid var(--primary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .matrices-wrapper {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .matrix-setup {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .matrix-cell {
+        width: 45px;
+        height: 35px;
+        font-size: 12px;
+    }
+
+    .matrix-operations {
+        gap: 8px;
+    }
+
+    .matrix-operations .graph-btn {
+        min-width: 70px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .matrix-cell {
+        width: 38px;
+        height: 32px;
+        font-size: 11px;
+    }
+
+    .matrix-grid {
+        padding: 10px;
+        gap: 2px;
+    }
+}

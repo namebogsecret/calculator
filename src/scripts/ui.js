@@ -72,7 +72,8 @@ export class ModeManager {
         this.modeElements = {
             calculator: document.getElementById('calculator'),
             graphContainer: document.getElementById('graphContainer'),
-            statisticsContainer: document.getElementById('statisticsContainer')
+            statisticsContainer: document.getElementById('statisticsContainer'),
+            matrixContainer: document.getElementById('matrixContainer')
         };
     }
 
@@ -107,13 +108,17 @@ export class ModeManager {
         if (this.modeElements.calculator) {
             this.modeElements.calculator.className = 'calculator-container';
         }
-        
+
         if (this.modeElements.graphContainer) {
             this.modeElements.graphContainer.style.display = 'none';
         }
-        
+
         if (this.modeElements.statisticsContainer) {
             this.modeElements.statisticsContainer.style.display = 'none';
+        }
+
+        if (this.modeElements.matrixContainer) {
+            this.modeElements.matrixContainer.style.display = 'none';
         }
 
         // Show appropriate container
@@ -134,6 +139,11 @@ export class ModeManager {
             case 'statistics':
                 if (this.modeElements.statisticsContainer) {
                     this.modeElements.statisticsContainer.style.display = 'block';
+                }
+                break;
+            case 'matrix':
+                if (this.modeElements.matrixContainer) {
+                    this.modeElements.matrixContainer.style.display = 'block';
                 }
                 break;
         }

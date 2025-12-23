@@ -59,6 +59,7 @@ export class ComponentLoader {
             { path: 'src/components/display.html', container: 'display-container' },
             { path: 'src/components/graph-container.html', container: 'graph-container' },
             { path: 'src/components/statistics-container.html', container: 'statistics-container' },
+            { path: 'src/components/matrix-container.html', container: 'matrix-container' },
             { path: 'src/components/buttons-container.html', container: 'buttons-container' }
         ];
 
