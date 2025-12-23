@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="src/styles/modes.css">
     <link rel="stylesheet" href="src/styles/graphs.css">
     <link rel="stylesheet" href="src/styles/statistics.css">
+    <link rel="stylesheet" href="src/styles/matrix.css">
     <link rel="stylesheet" href="src/styles/animations.css">
     <link rel="stylesheet" href="src/styles/responsive.css">
 </head>
@@ -32,7 +33,10 @@
             
             <!-- Statistics Container -->
             <div id="statistics-container"></div>
-            
+
+            <!-- Matrix Container -->
+            <div id="matrix-container"></div>
+
             <!-- Calculator Buttons -->
             <div id="buttons-container"></div>
         </div>
@@ -1017,7 +1021,837 @@
                     if (helpSpan) helpSpan.textContent = info.help;
                     if (input) input.placeholder = info.placeholder;
                 };
-                
+
+                // ============ Matrix Functions ============
+
+                // Matrix state
+                window.matrixState = {
+                    A: { rows: 3, cols: 3, data: null },
+                    B: { rows: 3, cols: 3, data: null },
+                    det: { size: 3, data: null },
+                    inv: { size: 3, data: null },
+                    eigen: { size: 3, data: null },
+                    sys: { equations: 3, variables: 3, data: null }
+                };
+
+                // Initialize matrices on first load
+                window.initializeMatrices = () => {
+                    updateMatrixA();
+                    updateMatrixB();
+                    updateDetMatrix();
+                    updateInvMatrix();
+                    updateEigenMatrix();
+                    updateSystemMatrix();
+                };
+
+                // Matrix Tab Switching
+                window.switchMatrixTab = (tab) => {
+                    const container = document.getElementById('matrixContainer');
+                    if (!container) return;
+
+                    const tabButtons = container.querySelectorAll('.tab-btn');
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+
+                    const clickedBtn = Array.from(tabButtons).find(btn =>
+                        btn.onclick?.toString().includes(tab)
+                    );
+                    if (clickedBtn) clickedBtn.classList.add('active');
+
+                    const tabContents = container.querySelectorAll('.tab-content');
+                    tabContents.forEach(content => content.classList.remove('active'));
+
+                    const targetContent = container.querySelector(`#${tab}-tab`);
+                    if (targetContent) targetContent.classList.add('active');
+                };
+
+                // Create matrix grid
+                window.createMatrixGrid = (containerId, rows, cols, editable = true, augmented = false, augmentedCol = -1) => {
+                    const container = document.getElementById(containerId);
+                    if (!container) return;
+
+                    container.innerHTML = '';
+                    container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+                    for (let i = 0; i < rows; i++) {
+                        for (let j = 0; j < cols; j++) {
+                            if (editable) {
+                                const input = document.createElement('input');
+                                input.type = 'number';
+                                input.className = 'matrix-cell';
+                                input.value = '0';
+                                input.step = 'any';
+                                input.dataset.row = i;
+                                input.dataset.col = j;
+                                if (augmented && j === augmentedCol) {
+                                    input.classList.add('augmented-separator');
+                                }
+                                container.appendChild(input);
+                            } else {
+                                const cell = document.createElement('div');
+                                cell.className = 'matrix-cell result-cell';
+                                cell.textContent = '0';
+                                cell.dataset.row = i;
+                                cell.dataset.col = j;
+                                container.appendChild(cell);
+                            }
+                        }
+                    }
+                };
+
+                // Read matrix from grid
+                window.readMatrixFromGrid = (containerId, rows, cols) => {
+                    const container = document.getElementById(containerId);
+                    if (!container) return null;
+
+                    const data = [];
+                    for (let i = 0; i < rows; i++) {
+                        const row = [];
+                        for (let j = 0; j < cols; j++) {
+                            const input = container.querySelector(`input[data-row="${i}"][data-col="${j}"]`);
+                            row.push(input ? parseFloat(input.value) || 0 : 0);
+                        }
+                        data.push(row);
+                    }
+                    return data;
+                };
+
+                // Write matrix to grid
+                window.writeMatrixToGrid = (containerId, data) => {
+                    const container = document.getElementById(containerId);
+                    if (!container || !data) return;
+
+                    const rows = data.length;
+                    const cols = data[0].length;
+
+                    container.innerHTML = '';
+                    container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+                    for (let i = 0; i < rows; i++) {
+                        for (let j = 0; j < cols; j++) {
+                            const cell = document.createElement('div');
+                            cell.className = 'matrix-cell result-cell';
+                            const value = data[i][j];
+                            cell.textContent = Math.abs(value) < 1e-10 ? '0' : value.toFixed(4);
+                            container.appendChild(cell);
+                        }
+                    }
+                };
+
+                // Update Matrix A
+                window.updateMatrixA = () => {
+                    const rows = parseInt(document.getElementById('matrixARows')?.value) || 3;
+                    const cols = parseInt(document.getElementById('matrixACols')?.value) || 3;
+                    matrixState.A.rows = rows;
+                    matrixState.A.cols = cols;
+                    createMatrixGrid('matrixAGrid', rows, cols);
+                };
+
+                // Update Matrix B
+                window.updateMatrixB = () => {
+                    const rows = parseInt(document.getElementById('matrixBRows')?.value) || 3;
+                    const cols = parseInt(document.getElementById('matrixBCols')?.value) || 3;
+                    matrixState.B.rows = rows;
+                    matrixState.B.cols = cols;
+                    createMatrixGrid('matrixBGrid', rows, cols);
+                };
+
+                // Fill matrix functions
+                window.fillMatrixRandom = (name) => {
+                    const gridId = `matrix${name}Grid`;
+                    const container = document.getElementById(gridId);
+                    if (!container) return;
+
+                    const inputs = container.querySelectorAll('input');
+                    inputs.forEach(input => {
+                        input.value = Math.floor(Math.random() * 21) - 10;
+                    });
+                };
+
+                window.fillMatrixIdentity = (name) => {
+                    const gridId = `matrix${name}Grid`;
+                    const container = document.getElementById(gridId);
+                    if (!container) return;
+
+                    const inputs = container.querySelectorAll('input');
+                    inputs.forEach(input => {
+                        const r = parseInt(input.dataset.row);
+                        const c = parseInt(input.dataset.col);
+                        input.value = r === c ? 1 : 0;
+                    });
+                };
+
+                window.fillMatrixZero = (name) => {
+                    const gridId = `matrix${name}Grid`;
+                    const container = document.getElementById(gridId);
+                    if (!container) return;
+
+                    const inputs = container.querySelectorAll('input');
+                    inputs.forEach(input => {
+                        input.value = 0;
+                    });
+                };
+
+                // Matrix class for operations
+                class MatrixCalc {
+                    constructor(rows, cols, data = null) {
+                        this.rows = rows;
+                        this.cols = cols;
+                        this.data = data || Array(rows).fill(null).map(() => Array(cols).fill(0));
+                    }
+
+                    static fromArray(arr) {
+                        return new MatrixCalc(arr.length, arr[0].length, arr.map(row => [...row]));
+                    }
+
+                    clone() {
+                        return new MatrixCalc(this.rows, this.cols, this.data.map(row => [...row]));
+                    }
+
+                    add(other) {
+                        if (this.rows !== other.rows || this.cols !== other.cols) {
+                            throw new Error('Матрицы должны иметь одинаковый размер');
+                        }
+                        const result = new MatrixCalc(this.rows, this.cols);
+                        for (let i = 0; i < this.rows; i++) {
+                            for (let j = 0; j < this.cols; j++) {
+                                result.data[i][j] = this.data[i][j] + other.data[i][j];
+                            }
+                        }
+                        return result;
+                    }
+
+                    subtract(other) {
+                        if (this.rows !== other.rows || this.cols !== other.cols) {
+                            throw new Error('Матрицы должны иметь одинаковый размер');
+                        }
+                        const result = new MatrixCalc(this.rows, this.cols);
+                        for (let i = 0; i < this.rows; i++) {
+                            for (let j = 0; j < this.cols; j++) {
+                                result.data[i][j] = this.data[i][j] - other.data[i][j];
+                            }
+                        }
+                        return result;
+                    }
+
+                    multiply(other) {
+                        if (this.cols !== other.rows) {
+                            throw new Error(`Невозможно умножить: ${this.rows}×${this.cols} на ${other.rows}×${other.cols}`);
+                        }
+                        const result = new MatrixCalc(this.rows, other.cols);
+                        for (let i = 0; i < this.rows; i++) {
+                            for (let j = 0; j < other.cols; j++) {
+                                let sum = 0;
+                                for (let k = 0; k < this.cols; k++) {
+                                    sum += this.data[i][k] * other.data[k][j];
+                                }
+                                result.data[i][j] = sum;
+                            }
+                        }
+                        return result;
+                    }
+
+                    scalarMultiply(scalar) {
+                        const result = new MatrixCalc(this.rows, this.cols);
+                        for (let i = 0; i < this.rows; i++) {
+                            for (let j = 0; j < this.cols; j++) {
+                                result.data[i][j] = this.data[i][j] * scalar;
+                            }
+                        }
+                        return result;
+                    }
+
+                    transpose() {
+                        const result = new MatrixCalc(this.cols, this.rows);
+                        for (let i = 0; i < this.rows; i++) {
+                            for (let j = 0; j < this.cols; j++) {
+                                result.data[j][i] = this.data[i][j];
+                            }
+                        }
+                        return result;
+                    }
+
+                    determinant() {
+                        if (this.rows !== this.cols) {
+                            throw new Error('Определитель существует только для квадратных матриц');
+                        }
+                        const n = this.rows;
+                        const matrix = this.clone();
+                        let det = 1;
+                        let swaps = 0;
+
+                        for (let col = 0; col < n; col++) {
+                            let maxRow = col;
+                            for (let row = col + 1; row < n; row++) {
+                                if (Math.abs(matrix.data[row][col]) > Math.abs(matrix.data[maxRow][col])) {
+                                    maxRow = row;
+                                }
+                            }
+
+                            if (maxRow !== col) {
+                                [matrix.data[col], matrix.data[maxRow]] = [matrix.data[maxRow], matrix.data[col]];
+                                swaps++;
+                            }
+
+                            if (Math.abs(matrix.data[col][col]) < 1e-10) {
+                                return 0;
+                            }
+
+                            det *= matrix.data[col][col];
+
+                            for (let row = col + 1; row < n; row++) {
+                                const factor = matrix.data[row][col] / matrix.data[col][col];
+                                for (let j = col; j < n; j++) {
+                                    matrix.data[row][j] -= factor * matrix.data[col][j];
+                                }
+                            }
+                        }
+
+                        return swaps % 2 === 0 ? det : -det;
+                    }
+
+                    inverse() {
+                        if (this.rows !== this.cols) {
+                            throw new Error('Обратная матрица существует только для квадратных матриц');
+                        }
+
+                        const n = this.rows;
+                        const det = this.determinant();
+
+                        if (Math.abs(det) < 1e-10) {
+                            throw new Error('Матрица вырожденная (det = 0)');
+                        }
+
+                        const augmented = new MatrixCalc(n, 2 * n);
+                        for (let i = 0; i < n; i++) {
+                            for (let j = 0; j < n; j++) {
+                                augmented.data[i][j] = this.data[i][j];
+                                augmented.data[i][j + n] = i === j ? 1 : 0;
+                            }
+                        }
+
+                        for (let col = 0; col < n; col++) {
+                            let maxRow = col;
+                            for (let row = col + 1; row < n; row++) {
+                                if (Math.abs(augmented.data[row][col]) > Math.abs(augmented.data[maxRow][col])) {
+                                    maxRow = row;
+                                }
+                            }
+
+                            [augmented.data[col], augmented.data[maxRow]] = [augmented.data[maxRow], augmented.data[col]];
+
+                            const pivot = augmented.data[col][col];
+                            for (let j = 0; j < 2 * n; j++) {
+                                augmented.data[col][j] /= pivot;
+                            }
+
+                            for (let row = 0; row < n; row++) {
+                                if (row !== col) {
+                                    const factor = augmented.data[row][col];
+                                    for (let j = 0; j < 2 * n; j++) {
+                                        augmented.data[row][j] -= factor * augmented.data[col][j];
+                                    }
+                                }
+                            }
+                        }
+
+                        const inv = new MatrixCalc(n, n);
+                        for (let i = 0; i < n; i++) {
+                            for (let j = 0; j < n; j++) {
+                                inv.data[i][j] = augmented.data[i][j + n];
+                            }
+                        }
+
+                        return inv;
+                    }
+
+                    trace() {
+                        if (this.rows !== this.cols) {
+                            throw new Error('След существует только для квадратных матриц');
+                        }
+                        let sum = 0;
+                        for (let i = 0; i < this.rows; i++) {
+                            sum += this.data[i][i];
+                        }
+                        return sum;
+                    }
+                }
+
+                // Matrix Operations
+                window.matrixAdd = () => {
+                    try {
+                        const dataA = readMatrixFromGrid('matrixAGrid', matrixState.A.rows, matrixState.A.cols);
+                        const dataB = readMatrixFromGrid('matrixBGrid', matrixState.B.rows, matrixState.B.cols);
+                        const A = MatrixCalc.fromArray(dataA);
+                        const B = MatrixCalc.fromArray(dataB);
+                        const result = A.add(B);
+                        writeMatrixToGrid('matrixResultGrid', result.data);
+                        calculatorApp.notificationManager.showSuccess('A + B вычислено');
+                    } catch (e) {
+                        display.showError(e.message);
+                    }
+                };
+
+                window.matrixSubtract = () => {
+                    try {
+                        const dataA = readMatrixFromGrid('matrixAGrid', matrixState.A.rows, matrixState.A.cols);
+                        const dataB = readMatrixFromGrid('matrixBGrid', matrixState.B.rows, matrixState.B.cols);
+                        const A = MatrixCalc.fromArray(dataA);
+                        const B = MatrixCalc.fromArray(dataB);
+                        const result = A.subtract(B);
+                        writeMatrixToGrid('matrixResultGrid', result.data);
+                        calculatorApp.notificationManager.showSuccess('A - B вычислено');
+                    } catch (e) {
+                        display.showError(e.message);
+                    }
+                };
+
+                window.matrixMultiply = () => {
+                    try {
+                        const dataA = readMatrixFromGrid('matrixAGrid', matrixState.A.rows, matrixState.A.cols);
+                        const dataB = readMatrixFromGrid('matrixBGrid', matrixState.B.rows, matrixState.B.cols);
+                        const A = MatrixCalc.fromArray(dataA);
+                        const B = MatrixCalc.fromArray(dataB);
+                        const result = A.multiply(B);
+                        writeMatrixToGrid('matrixResultGrid', result.data);
+                        calculatorApp.notificationManager.showSuccess('A × B вычислено');
+                    } catch (e) {
+                        display.showError(e.message);
+                    }
+                };
+
+                window.matrixTransposeA = () => {
+                    try {
+                        const dataA = readMatrixFromGrid('matrixAGrid', matrixState.A.rows, matrixState.A.cols);
+                        const A = MatrixCalc.fromArray(dataA);
+                        const result = A.transpose();
+                        writeMatrixToGrid('matrixResultGrid', result.data);
+                        calculatorApp.notificationManager.showSuccess('A^T вычислено');
+                    } catch (e) {
+                        display.showError(e.message);
+                    }
+                };
+
+                window.matrixTransposeB = () => {
+                    try {
+                        const dataB = readMatrixFromGrid('matrixBGrid', matrixState.B.rows, matrixState.B.cols);
+                        const B = MatrixCalc.fromArray(dataB);
+                        const result = B.transpose();
+                        writeMatrixToGrid('matrixResultGrid', result.data);
+                        calculatorApp.notificationManager.showSuccess('B^T вычислено');
+                    } catch (e) {
+                        display.showError(e.message);
+                    }
+                };
+
+                window.matrixScalarMultiply = () => {
+                    const section = document.getElementById('scalarInputSection');
+                    if (section) {
+                        section.style.display = section.style.display === 'none' ? 'flex' : 'none';
+                    }
+                };
+
+                window.applyScalarMultiply = () => {
+                    try {
+                        const scalar = parseFloat(document.getElementById('scalarValue')?.value) || 0;
+                        const dataA = readMatrixFromGrid('matrixAGrid', matrixState.A.rows, matrixState.A.cols);
+                        const A = MatrixCalc.fromArray(dataA);
+                        const result = A.scalarMultiply(scalar);
+                        writeMatrixToGrid('matrixResultGrid', result.data);
+                        document.getElementById('scalarInputSection').style.display = 'none';
+                        calculatorApp.notificationManager.showSuccess(`${scalar} × A вычислено`);
+                    } catch (e) {
+                        display.showError(e.message);
+                    }
+                };
+
+                // Determinant tab functions
+                window.updateDetMatrix = () => {
+                    const size = parseInt(document.getElementById('detMatrixSize')?.value) || 3;
+                    matrixState.det.size = size;
+                    const sizeDisplay = document.getElementById('detMatrixSizeDisplay');
+                    if (sizeDisplay) sizeDisplay.textContent = size;
+                    createMatrixGrid('detMatrixGrid', size, size);
+                };
+
+                window.fillDetMatrixRandom = () => {
+                    const container = document.getElementById('detMatrixGrid');
+                    if (!container) return;
+                    container.querySelectorAll('input').forEach(input => {
+                        input.value = Math.floor(Math.random() * 21) - 10;
+                    });
+                };
+
+                window.fillDetMatrixIdentity = () => {
+                    const container = document.getElementById('detMatrixGrid');
+                    if (!container) return;
+                    container.querySelectorAll('input').forEach(input => {
+                        const r = parseInt(input.dataset.row);
+                        const c = parseInt(input.dataset.col);
+                        input.value = r === c ? 1 : 0;
+                    });
+                };
+
+                window.calculateDeterminant = () => {
+                    try {
+                        const size = matrixState.det.size;
+                        const data = readMatrixFromGrid('detMatrixGrid', size, size);
+                        const matrix = MatrixCalc.fromArray(data);
+                        const det = matrix.determinant();
+
+                        document.getElementById('detValue').textContent = det.toFixed(6);
+
+                        let matrixType = '';
+                        if (Math.abs(det) < 1e-10) {
+                            matrixType = 'Вырожденная (сингулярная)';
+                        } else if (Math.abs(det - 1) < 1e-10) {
+                            matrixType = 'Унимодулярная (det = 1)';
+                        } else if (Math.abs(det + 1) < 1e-10) {
+                            matrixType = 'det = -1';
+                        } else {
+                            matrixType = 'Невырожденная';
+                        }
+                        document.getElementById('detMatrixType').textContent = matrixType;
+
+                        document.getElementById('detResults').style.display = 'block';
+                        calculatorApp.notificationManager.showSuccess('Определитель вычислен');
+                    } catch (e) {
+                        display.showError(e.message);
+                    }
+                };
+
+                // Inverse tab functions
+                window.updateInvMatrix = () => {
+                    const size = parseInt(document.getElementById('invMatrixSize')?.value) || 3;
+                    matrixState.inv.size = size;
+                    const sizeDisplay = document.getElementById('invMatrixSizeDisplay');
+                    if (sizeDisplay) sizeDisplay.textContent = size;
+                    createMatrixGrid('invMatrixGrid', size, size);
+                };
+
+                window.fillInvMatrixRandom = () => {
+                    const container = document.getElementById('invMatrixGrid');
+                    if (!container) return;
+                    container.querySelectorAll('input').forEach(input => {
+                        input.value = Math.floor(Math.random() * 21) - 10;
+                    });
+                };
+
+                window.fillInvMatrixIdentity = () => {
+                    const container = document.getElementById('invMatrixGrid');
+                    if (!container) return;
+                    container.querySelectorAll('input').forEach(input => {
+                        const r = parseInt(input.dataset.row);
+                        const c = parseInt(input.dataset.col);
+                        input.value = r === c ? 1 : 0;
+                    });
+                };
+
+                window.calculateInverse = () => {
+                    try {
+                        const size = matrixState.inv.size;
+                        const data = readMatrixFromGrid('invMatrixGrid', size, size);
+                        const matrix = MatrixCalc.fromArray(data);
+                        const det = matrix.determinant();
+
+                        document.getElementById('invDetValue').textContent = det.toFixed(6);
+
+                        if (Math.abs(det) < 1e-10) {
+                            document.getElementById('invStatus').textContent = 'Обратной матрицы не существует (det = 0)';
+                            document.getElementById('invResultGrid').innerHTML = '<div style="color: var(--error); padding: 20px;">Матрица вырожденная</div>';
+                            return;
+                        }
+
+                        const inv = matrix.inverse();
+                        writeMatrixToGrid('invResultGrid', inv.data);
+                        document.getElementById('invStatus').textContent = 'Обратная матрица найдена';
+                        document.getElementById('invResults').style.display = 'block';
+                        calculatorApp.notificationManager.showSuccess('Обратная матрица вычислена');
+                    } catch (e) {
+                        display.showError(e.message);
+                    }
+                };
+
+                // Eigenvalues tab functions
+                window.updateEigenMatrix = () => {
+                    const size = parseInt(document.getElementById('eigenMatrixSize')?.value) || 3;
+                    matrixState.eigen.size = size;
+                    const sizeDisplay = document.getElementById('eigenMatrixSizeDisplay');
+                    if (sizeDisplay) sizeDisplay.textContent = size;
+                    createMatrixGrid('eigenMatrixGrid', size, size);
+                };
+
+                window.fillEigenMatrixRandom = () => {
+                    const container = document.getElementById('eigenMatrixGrid');
+                    if (!container) return;
+                    container.querySelectorAll('input').forEach(input => {
+                        input.value = Math.floor(Math.random() * 21) - 10;
+                    });
+                };
+
+                window.fillEigenMatrixSymmetric = () => {
+                    const size = matrixState.eigen.size;
+                    const container = document.getElementById('eigenMatrixGrid');
+                    if (!container) return;
+
+                    const values = [];
+                    for (let i = 0; i < size; i++) {
+                        values[i] = [];
+                        for (let j = 0; j < size; j++) {
+                            if (j >= i) {
+                                values[i][j] = Math.floor(Math.random() * 21) - 10;
+                            } else {
+                                values[i][j] = values[j][i];
+                            }
+                        }
+                    }
+
+                    container.querySelectorAll('input').forEach(input => {
+                        const r = parseInt(input.dataset.row);
+                        const c = parseInt(input.dataset.col);
+                        input.value = values[r][c];
+                    });
+                };
+
+                window.calculateEigenvalues = () => {
+                    try {
+                        const size = matrixState.eigen.size;
+                        const data = readMatrixFromGrid('eigenMatrixGrid', size, size);
+                        const matrix = MatrixCalc.fromArray(data);
+                        const trace = matrix.trace();
+                        const det = matrix.determinant();
+
+                        document.getElementById('eigenTrace').textContent = trace.toFixed(6);
+                        document.getElementById('eigenDet').textContent = det.toFixed(6);
+
+                        if (size === 2) {
+                            const discriminant = trace * trace - 4 * det;
+                            let eigenStr, polyStr;
+
+                            polyStr = `λ² - ${trace.toFixed(4)}λ + ${det.toFixed(4)} = 0`;
+
+                            if (discriminant >= 0) {
+                                const lambda1 = (trace + Math.sqrt(discriminant)) / 2;
+                                const lambda2 = (trace - Math.sqrt(discriminant)) / 2;
+                                eigenStr = `λ₁ = ${lambda1.toFixed(6)}, λ₂ = ${lambda2.toFixed(6)}`;
+                            } else {
+                                const realPart = trace / 2;
+                                const imagPart = Math.sqrt(-discriminant) / 2;
+                                eigenStr = `λ₁ = ${realPart.toFixed(4)} + ${imagPart.toFixed(4)}i, λ₂ = ${realPart.toFixed(4)} - ${imagPart.toFixed(4)}i`;
+                            }
+
+                            document.getElementById('eigenValues').textContent = eigenStr;
+                            document.getElementById('eigenPoly').textContent = polyStr;
+                        } else if (size === 3) {
+                            const a = data;
+                            const c = (a[0][0] * a[1][1] + a[1][1] * a[2][2] + a[0][0] * a[2][2]) -
+                                      (a[0][1] * a[1][0] + a[1][2] * a[2][1] + a[0][2] * a[2][0]);
+
+                            const polyStr = `λ³ - ${trace.toFixed(4)}λ² + ${c.toFixed(4)}λ - ${det.toFixed(4)} = 0`;
+                            document.getElementById('eigenPoly').textContent = polyStr;
+
+                            const eigenvalues = solveCubicEigen(-trace, c, -det);
+                            const eigenStr = eigenvalues.map((e, i) => `λ${i + 1} = ${e.toFixed(6)}`).join(', ');
+                            document.getElementById('eigenValues').textContent = eigenStr;
+                        } else {
+                            document.getElementById('eigenValues').textContent = 'Используйте численные методы для матриц > 3×3';
+                            document.getElementById('eigenPoly').textContent = 'N/A';
+                        }
+
+                        document.getElementById('eigenResults').style.display = 'block';
+                        calculatorApp.notificationManager.showSuccess('Собственные числа вычислены');
+                    } catch (e) {
+                        display.showError(e.message);
+                    }
+                };
+
+                function solveCubicEigen(a, b, c) {
+                    const p = b - a * a / 3;
+                    const q = 2 * a * a * a / 27 - a * b / 3 + c;
+                    const D = q * q / 4 + p * p * p / 27;
+
+                    const roots = [];
+
+                    if (D > 1e-10) {
+                        const sqrtD = Math.sqrt(D);
+                        const u = Math.cbrt(-q / 2 + sqrtD);
+                        const v = Math.cbrt(-q / 2 - sqrtD);
+                        roots.push(u + v - a / 3);
+                    } else if (D < -1e-10) {
+                        const r = Math.sqrt(-p * p * p / 27);
+                        const theta = Math.acos(-q / (2 * r));
+                        const cubeRootR = Math.cbrt(r);
+
+                        roots.push(2 * cubeRootR * Math.cos(theta / 3) - a / 3);
+                        roots.push(2 * cubeRootR * Math.cos((theta + 2 * Math.PI) / 3) - a / 3);
+                        roots.push(2 * cubeRootR * Math.cos((theta + 4 * Math.PI) / 3) - a / 3);
+                    } else {
+                        if (Math.abs(q) < 1e-10) {
+                            roots.push(-a / 3);
+                        } else {
+                            roots.push(3 * q / p - a / 3);
+                            roots.push(-3 * q / (2 * p) - a / 3);
+                        }
+                    }
+
+                    return roots.map(r => Math.abs(r) < 1e-10 ? 0 : r).sort((x, y) => y - x);
+                }
+
+                // System of linear equations tab functions
+                window.updateSystemMatrix = () => {
+                    const equations = parseInt(document.getElementById('sysEquations')?.value) || 3;
+                    const variables = parseInt(document.getElementById('sysVariables')?.value) || 3;
+                    matrixState.sys.equations = equations;
+                    matrixState.sys.variables = variables;
+                    createMatrixGrid('sysMatrixGrid', equations, variables + 1, true, true, variables);
+                };
+
+                window.fillSystemRandom = () => {
+                    const container = document.getElementById('sysMatrixGrid');
+                    if (!container) return;
+                    container.querySelectorAll('input').forEach(input => {
+                        input.value = Math.floor(Math.random() * 21) - 10;
+                    });
+                };
+
+                window.clearSystemMatrix = () => {
+                    const container = document.getElementById('sysMatrixGrid');
+                    if (!container) return;
+                    container.querySelectorAll('input').forEach(input => {
+                        input.value = 0;
+                    });
+                };
+
+                window.solveSystem = () => {
+                    try {
+                        const m = matrixState.sys.equations;
+                        const n = matrixState.sys.variables;
+                        const data = readMatrixFromGrid('sysMatrixGrid', m, n + 1);
+                        const matrix = MatrixCalc.fromArray(data);
+
+                        const result = gaussianEliminationSolve(matrix, m, n);
+
+                        document.getElementById('sysSolution').textContent = result.solution;
+                        document.getElementById('sysSolutionType').textContent = result.type;
+                        document.getElementById('sysRank').textContent = result.rank;
+                        document.getElementById('sysResults').style.display = 'block';
+
+                        calculatorApp.notificationManager.showSuccess('Система решена');
+                    } catch (e) {
+                        display.showError(e.message);
+                    }
+                };
+
+                function gaussianEliminationSolve(matrix, m, n) {
+                    const mat = matrix.clone();
+                    let pivotRow = 0;
+                    const pivotCols = [];
+
+                    for (let col = 0; col < n && pivotRow < m; col++) {
+                        let maxRow = pivotRow;
+                        for (let row = pivotRow + 1; row < m; row++) {
+                            if (Math.abs(mat.data[row][col]) > Math.abs(mat.data[maxRow][col])) {
+                                maxRow = row;
+                            }
+                        }
+
+                        if (Math.abs(mat.data[maxRow][col]) < 1e-10) continue;
+
+                        [mat.data[pivotRow], mat.data[maxRow]] = [mat.data[maxRow], mat.data[pivotRow]];
+
+                        const pivot = mat.data[pivotRow][col];
+                        for (let j = 0; j <= n; j++) {
+                            mat.data[pivotRow][j] /= pivot;
+                        }
+
+                        for (let row = pivotRow + 1; row < m; row++) {
+                            const factor = mat.data[row][col];
+                            for (let j = 0; j <= n; j++) {
+                                mat.data[row][j] -= factor * mat.data[pivotRow][j];
+                            }
+                        }
+
+                        pivotCols.push({ row: pivotRow, col: col });
+                        pivotRow++;
+                    }
+
+                    for (let i = pivotCols.length - 1; i >= 0; i--) {
+                        const { row, col } = pivotCols[i];
+                        for (let upperRow = 0; upperRow < row; upperRow++) {
+                            const factor = mat.data[upperRow][col];
+                            for (let j = 0; j <= n; j++) {
+                                mat.data[upperRow][j] -= factor * mat.data[row][j];
+                            }
+                        }
+                    }
+
+                    const rank = pivotCols.length;
+
+                    for (let row = 0; row < m; row++) {
+                        let allZeros = true;
+                        for (let col = 0; col < n; col++) {
+                            if (Math.abs(mat.data[row][col]) > 1e-10) {
+                                allZeros = false;
+                                break;
+                            }
+                        }
+                        if (allZeros && Math.abs(mat.data[row][n]) > 1e-10) {
+                            return {
+                                solution: 'Нет решений',
+                                type: 'Несовместная система',
+                                rank: rank
+                            };
+                        }
+                    }
+
+                    if (rank === n) {
+                        const solution = [];
+                        for (let col = 0; col < n; col++) {
+                            const pivotInfo = pivotCols.find(p => p.col === col);
+                            if (pivotInfo) {
+                                solution.push(`x${col + 1} = ${mat.data[pivotInfo.row][n].toFixed(6)}`);
+                            }
+                        }
+                        return {
+                            solution: solution.join(', '),
+                            type: 'Единственное решение',
+                            rank: rank
+                        };
+                    }
+
+                    const freeVars = [];
+                    for (let col = 0; col < n; col++) {
+                        if (!pivotCols.some(p => p.col === col)) {
+                            freeVars.push(`x${col + 1}`);
+                        }
+                    }
+
+                    return {
+                        solution: `Свободные переменные: ${freeVars.join(', ')}`,
+                        type: 'Бесконечно много решений',
+                        rank: rank
+                    };
+                }
+
+                window.showGaussSteps = () => {
+                    const stepsDiv = document.getElementById('gaussSteps');
+                    if (stepsDiv) {
+                        stepsDiv.style.display = stepsDiv.style.display === 'none' ? 'block' : 'none';
+                    }
+                    const container = document.getElementById('stepsContainer');
+                    if (container) {
+                        container.innerHTML = '<p style="color: var(--text-secondary);">Нажмите "Решить систему" для просмотра шагов</p>';
+                    }
+                };
+
+                // Initialize matrices when entering matrix mode
+                const originalSetMode = window.setMode;
+                window.setMode = (mode) => {
+                    originalSetMode(mode);
+                    if (mode === 'matrix') {
+                        setTimeout(initializeMatrices, 100);
+                    }
+                };
+
                 console.log('Calculator application initialized successfully');
             } catch (error) {
                 console.error('Failed to initialize calculator application:', error);
