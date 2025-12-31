@@ -1,26 +1,26 @@
 <div class="buttons">
-    <button class="btn btn-clear" onclick="clearDisplay()">C</button>
-    <button class="btn btn-function" onclick="deleteLastChar()">⌫</button>
-    <button class="btn btn-function" onclick="appendToDisplay('/')">/</button>
-    <button class="btn btn-operator" onclick="appendToDisplay('*')">×</button>
-    
-    <button class="btn btn-number" onclick="appendToDisplay('7')">7</button>
-    <button class="btn btn-number" onclick="appendToDisplay('8')">8</button>
-    <button class="btn btn-number" onclick="appendToDisplay('9')">9</button>
-    <button class="btn btn-operator" onclick="appendToDisplay('-')">−</button>
-    
-    <button class="btn btn-number" onclick="appendToDisplay('4')">4</button>
-    <button class="btn btn-number" onclick="appendToDisplay('5')">5</button>
-    <button class="btn btn-number" onclick="appendToDisplay('6')">6</button>
-    <button class="btn btn-operator" onclick="appendToDisplay('+')">+</button>
-    
-    <button class="btn btn-number" onclick="appendToDisplay('1')">1</button>
-    <button class="btn btn-number" onclick="appendToDisplay('2')">2</button>
-    <button class="btn btn-number" onclick="appendToDisplay('3')">3</button>
-    <button class="btn btn-equals" onclick="calculate()">=</button>
-    
-    <button class="btn btn-number" onclick="appendToDisplay('0')">0</button>
-    <button class="btn btn-number" onclick="appendToDisplay('.')">.</button>
-    <button class="btn btn-function" onclick="appendToDisplay('(')">(</button>
-    <button class="btn btn-function" onclick="appendToDisplay(')')">)</button>
+    <button class="btn btn-clear" onclick="clearDisplay()" data-value="C">C</button>
+    <button class="btn btn-function btn-delete" onclick="deleteLastChar()" data-value="⌫">⌫</button>
+    <button class="btn btn-function" onclick="appendToDisplay('/')" data-value="/">÷</button>
+    <button class="btn btn-operator" onclick="appendToDisplay('*')" data-value="×">×</button>
+
+    <button class="btn btn-number" onclick="appendToDisplay('7')" data-value="7">7</button>
+    <button class="btn btn-number" onclick="appendToDisplay('8')" data-value="8">8</button>
+    <button class="btn btn-number" onclick="appendToDisplay('9')" data-value="9">9</button>
+    <button class="btn btn-operator" onclick="appendToDisplay('-')" data-value="-">−</button>
+
+    <button class="btn btn-number" onclick="appendToDisplay('4')" data-value="4">4</button>
+    <button class="btn btn-number" onclick="appendToDisplay('5')" data-value="5">5</button>
+    <button class="btn btn-number" onclick="appendToDisplay('6')" data-value="6">6</button>
+    <button class="btn btn-operator" onclick="appendToDisplay('+')" data-value="+">+</button>
+
+    <button class="btn btn-number" onclick="appendToDisplay('1')" data-value="1">1</button>
+    <button class="btn btn-number" onclick="appendToDisplay('2')" data-value="2">2</button>
+    <button class="btn btn-number" onclick="appendToDisplay('3')" data-value="3">3</button>
+    <button class="btn btn-equals" onclick="calculate()" data-value="=">=</button>
+
+    <button class="btn btn-number btn-zero" onclick="appendToDisplay('0')" data-value="0">0</button>
+    <button class="btn btn-number" onclick="appendToDisplay('.')" data-value=".">.</button>
+    <button class="btn btn-function" onclick="appendToDisplay('(')" data-value="(">(</button>
+    <button class="btn btn-function" onclick="appendToDisplay(')')" data-value=")">)</button>
 </div>
