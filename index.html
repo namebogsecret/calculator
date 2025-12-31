@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="src/styles/statistics.css">
     <link rel="stylesheet" href="src/styles/matrix.css">
     <link rel="stylesheet" href="src/styles/animations.css">
+    <link rel="stylesheet" href="src/styles/effects.css">
     <link rel="stylesheet" href="src/styles/responsive.css">
 </head>
 <body>
@@ -46,7 +47,8 @@
     <script type="module">
         import { ComponentLoader } from './src/scripts/component-loader.js';
         import CalculatorApp from './src/scripts/app.js';
-        
+        import { effectsController } from './src/scripts/effects.js';
+
         // Initialize the application
         document.addEventListener('DOMContentLoaded', async () => {
             try {
@@ -59,6 +61,10 @@
                 
                 // Make it globally accessible for debugging
                 window.calculatorApp = calculatorApp;
+
+                // Initialize effects system (sounds, confetti, themes, etc.)
+                effectsController.init();
+                window.effectsController = effectsController;
                 
                 // Expose global functions for HTML onclick handlers
                 const calc = calculatorApp.getCalculator();
@@ -100,8 +106,12 @@
                     const result = calc.calculate();
                     if (result.success) {
                         display.updateResult(result.result, result.formattedResult);
+                        // Trigger effects on successful calculation
+                        effectsController.onCalculationComplete(result.formattedResult || result.result.toString(), true);
                     } else {
                         display.showError(result.error);
+                        // Trigger error effects
+                        effectsController.onCalculationComplete(null, false);
                     }
                 };
 
