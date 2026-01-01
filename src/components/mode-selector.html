@@ -1,10 +1,16 @@
 <div class="mode-selector">
-    <button class="mode-btn active" onclick="setMode('basic')">Основной</button>
-    <button class="mode-btn" onclick="setMode('scientific')">Научный</button>
-    <button class="mode-btn" onclick="setMode('graph')">Графики</button>
-    <button class="mode-btn" onclick="setMode('statistics')">Статистика</button>
-    <button class="mode-btn" onclick="setMode('matrix')">Матрицы</button>
-    <button class="fit-screen-toggle" onclick="toggleFitScreen()" title="Подогнать под экран">
+    <button class="mode-btn active" onclick="setMode('basic')" data-i18n="modes.basic">Basic</button>
+    <button class="mode-btn" onclick="setMode('scientific')" data-i18n="modes.scientific">Scientific</button>
+    <button class="mode-btn" onclick="setMode('graph')" data-i18n="modes.graph">Graphs</button>
+    <button class="mode-btn" onclick="setMode('statistics')" data-i18n="modes.statistics">Statistics</button>
+    <button class="mode-btn" onclick="setMode('matrix')" data-i18n="modes.matrix">Matrices</button>
+    <div class="language-switcher">
+        <select id="languageSelect" class="language-select" onchange="changeLanguage(this.value)">
+            <option value="en">EN</option>
+            <option value="ru">RU</option>
+        </select>
+    </div>
+    <button class="fit-screen-toggle" onclick="toggleFitScreen()" data-i18n-title="common.fitScreen" title="Fit to screen">
         <span class="fit-icon">⛶</span>
     </button>
 </div>

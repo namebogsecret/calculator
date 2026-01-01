@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Продвинутый графический калькулятор</title>
+    <title>Advanced Graphing Calculator</title>
     
     <!-- CSS Modules -->
     <link rel="stylesheet" href="src/styles/variables.css">
@@ -48,13 +48,17 @@
         import { ComponentLoader } from './src/scripts/component-loader.js';
         import CalculatorApp from './src/scripts/app.js';
         import { effectsController } from './src/scripts/effects.js';
+        import { initI18n, setLocale, t, applyTranslations } from './src/scripts/i18n.js';
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 // Load all HTML components
                 await ComponentLoader.initializeCalculatorComponents();
-                
+
+                // Initialize i18n system
+                await initI18n();
+
                 // Initialize the calculator application
                 const calculatorApp = new CalculatorApp();
                 await calculatorApp.init();
@@ -65,6 +69,13 @@
                 // Initialize effects system (sounds, confetti, themes, etc.)
                 effectsController.init();
                 window.effectsController = effectsController;
+
+                // Make i18n functions globally accessible
+                window.changeLanguage = async (locale) => {
+                    await setLocale(locale);
+                };
+                window.t = t;
+                window.applyTranslations = applyTranslations;
                 
                 // Expose global functions for HTML onclick handlers
                 const calc = calculatorApp.getCalculator();
@@ -1867,9 +1878,9 @@
                 console.error('Failed to initialize calculator application:', error);
                 document.body.innerHTML = `
                     <div style="color: red; text-align: center; padding: 20px;">
-                        <h2>Ошибка загрузки калькулятора</h2>
-                        <p>Произошла ошибка при инициализации приложения.</p>
-                        <p>Подробности в консоли разработчика.</p>
+                        <h2>Calculator Loading Error</h2>
+                        <p>An error occurred while initializing the application.</p>
+                        <p>Check the developer console for details.</p>
                     </div>
                 `;
             }

@@ -1,23 +1,23 @@
 <div class="matrix-container" id="matrixContainer">
     <div class="graph-tabs">
-        <button class="tab-btn active" onclick="switchMatrixTab('operations')">Операции</button>
-        <button class="tab-btn" onclick="switchMatrixTab('determinant')">Детерминант</button>
-        <button class="tab-btn" onclick="switchMatrixTab('inverse')">Обратная</button>
-        <button class="tab-btn" onclick="switchMatrixTab('eigen')">Собств. числа</button>
-        <button class="tab-btn" onclick="switchMatrixTab('systems')">СЛАУ</button>
+        <button class="tab-btn active" onclick="switchMatrixTab('operations')" data-i18n="matrix.tabs.operations">Operations</button>
+        <button class="tab-btn" onclick="switchMatrixTab('determinant')" data-i18n="matrix.tabs.determinant">Determinant</button>
+        <button class="tab-btn" onclick="switchMatrixTab('inverse')" data-i18n="matrix.tabs.inverse">Inverse</button>
+        <button class="tab-btn" onclick="switchMatrixTab('eigen')" data-i18n="matrix.tabs.eigenvalues">Eigenvalues</button>
+        <button class="tab-btn" onclick="switchMatrixTab('systems')" data-i18n="matrix.tabs.systems">Systems</button>
     </div>
 
     <!-- Operations Tab -->
     <div class="tab-content active" id="operations-tab">
         <div class="matrix-setup">
             <div class="matrix-size-controls">
-                <label>Матрица A:</label>
+                <label data-i18n="matrix.matrixA">Matrix A:</label>
                 <input type="number" id="matrixARows" value="3" min="1" max="10" onchange="updateMatrixA()">
                 <span>×</span>
                 <input type="number" id="matrixACols" value="3" min="1" max="10" onchange="updateMatrixA()">
             </div>
             <div class="matrix-size-controls">
-                <label>Матрица B:</label>
+                <label data-i18n="matrix.matrixB">Matrix B:</label>
                 <input type="number" id="matrixBRows" value="3" min="1" max="10" onchange="updateMatrixB()">
                 <span>×</span>
                 <input type="number" id="matrixBCols" value="3" min="1" max="10" onchange="updateMatrixB()">
@@ -26,21 +26,21 @@
 
         <div class="matrices-wrapper">
             <div class="matrix-input-section">
-                <h4>Матрица A</h4>
+                <h4 data-i18n="matrix.matrixA">Matrix A</h4>
                 <div class="matrix-grid" id="matrixAGrid"></div>
                 <div class="matrix-quick-actions">
-                    <button class="graph-btn small" onclick="fillMatrixRandom('A')">Случайная</button>
-                    <button class="graph-btn small" onclick="fillMatrixIdentity('A')">Единичная</button>
-                    <button class="graph-btn small" onclick="fillMatrixZero('A')">Нулевая</button>
+                    <button class="graph-btn small" onclick="fillMatrixRandom('A')" data-i18n="common.random">Random</button>
+                    <button class="graph-btn small" onclick="fillMatrixIdentity('A')" data-i18n="common.identity">Identity</button>
+                    <button class="graph-btn small" onclick="fillMatrixZero('A')" data-i18n="common.zero">Zero</button>
                 </div>
             </div>
             <div class="matrix-input-section">
-                <h4>Матрица B</h4>
+                <h4 data-i18n="matrix.matrixB">Matrix B</h4>
                 <div class="matrix-grid" id="matrixBGrid"></div>
                 <div class="matrix-quick-actions">
-                    <button class="graph-btn small" onclick="fillMatrixRandom('B')">Случайная</button>
-                    <button class="graph-btn small" onclick="fillMatrixIdentity('B')">Единичная</button>
-                    <button class="graph-btn small" onclick="fillMatrixZero('B')">Нулевая</button>
+                    <button class="graph-btn small" onclick="fillMatrixRandom('B')" data-i18n="common.random">Random</button>
+                    <button class="graph-btn small" onclick="fillMatrixIdentity('B')" data-i18n="common.identity">Identity</button>
+                    <button class="graph-btn small" onclick="fillMatrixZero('B')" data-i18n="common.zero">Zero</button>
                 </div>
             </div>
         </div>
@@ -55,13 +55,13 @@
         </div>
 
         <div class="scalar-input" style="display: none;" id="scalarInputSection">
-            <label>Скаляр k:</label>
+            <label data-i18n="matrix.scalarK">Scalar k:</label>
             <input type="number" id="scalarValue" value="2" step="any">
-            <button class="graph-btn" onclick="applyScalarMultiply()">Применить</button>
+            <button class="graph-btn" onclick="applyScalarMultiply()" data-i18n="common.apply">Apply</button>
         </div>
 
         <div class="matrix-result-section">
-            <h4>Результат</h4>
+            <h4 data-i18n="common.result">Result</h4>
             <div class="matrix-grid result" id="matrixResultGrid"></div>
         </div>
     </div>
@@ -70,7 +70,7 @@
     <div class="tab-content" id="determinant-tab">
         <div class="matrix-setup">
             <div class="matrix-size-controls">
-                <label>Размер матрицы:</label>
+                <label data-i18n="matrix.matrixSize">Matrix size:</label>
                 <input type="number" id="detMatrixSize" value="3" min="1" max="10" onchange="updateDetMatrix()">
                 <span>× </span>
                 <span id="detMatrixSizeDisplay">3</span>
@@ -78,25 +78,25 @@
         </div>
 
         <div class="matrix-input-section centered">
-            <h4>Матрица</h4>
+            <h4 data-i18n="matrix.matrixType">Matrix</h4>
             <div class="matrix-grid" id="detMatrixGrid"></div>
             <div class="matrix-quick-actions">
-                <button class="graph-btn small" onclick="fillDetMatrixRandom()">Случайная</button>
-                <button class="graph-btn small" onclick="fillDetMatrixIdentity()">Единичная</button>
+                <button class="graph-btn small" onclick="fillDetMatrixRandom()" data-i18n="common.random">Random</button>
+                <button class="graph-btn small" onclick="fillDetMatrixIdentity()" data-i18n="common.identity">Identity</button>
             </div>
         </div>
 
         <div class="matrix-operations">
-            <button class="graph-btn primary" onclick="calculateDeterminant()">Вычислить det(A)</button>
+            <button class="graph-btn primary" onclick="calculateDeterminant()" data-i18n="matrix.calculateDet">Calculate det(A)</button>
         </div>
 
         <div class="stats-results" id="detResults">
             <div class="stat-item">
-                <span class="stat-label">Определитель det(A):</span>
+                <span class="stat-label" data-i18n="matrix.determinantLabel">Determinant det(A):</span>
                 <span class="stat-value" id="detValue">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Матрица:</span>
+                <span class="stat-label" data-i18n="matrix.matrixType">Matrix:</span>
                 <span class="stat-value" id="detMatrixType">-</span>
             </div>
         </div>
@@ -106,7 +106,7 @@
     <div class="tab-content" id="inverse-tab">
         <div class="matrix-setup">
             <div class="matrix-size-controls">
-                <label>Размер матрицы:</label>
+                <label data-i18n="matrix.matrixSize">Matrix size:</label>
                 <input type="number" id="invMatrixSize" value="3" min="1" max="10" onchange="updateInvMatrix()">
                 <span>× </span>
                 <span id="invMatrixSizeDisplay">3</span>
@@ -114,20 +114,20 @@
         </div>
 
         <div class="matrix-input-section centered">
-            <h4>Исходная матрица A</h4>
+            <h4 data-i18n="matrix.sourceMatrix">Source matrix A</h4>
             <div class="matrix-grid" id="invMatrixGrid"></div>
             <div class="matrix-quick-actions">
-                <button class="graph-btn small" onclick="fillInvMatrixRandom()">Случайная</button>
-                <button class="graph-btn small" onclick="fillInvMatrixIdentity()">Единичная</button>
+                <button class="graph-btn small" onclick="fillInvMatrixRandom()" data-i18n="common.random">Random</button>
+                <button class="graph-btn small" onclick="fillInvMatrixIdentity()" data-i18n="common.identity">Identity</button>
             </div>
         </div>
 
         <div class="matrix-operations">
-            <button class="graph-btn primary" onclick="calculateInverse()">Вычислить A<sup>-1</sup></button>
+            <button class="graph-btn primary" onclick="calculateInverse()" data-i18n-html="matrix.calculateInverse">Calculate A<sup>-1</sup></button>
         </div>
 
         <div class="matrix-result-section">
-            <h4>Обратная матрица A<sup>-1</sup></h4>
+            <h4 data-i18n-html="matrix.inverseMatrix">Inverse matrix A<sup>-1</sup></h4>
             <div class="matrix-grid result" id="invResultGrid"></div>
         </div>
 
@@ -137,7 +137,7 @@
                 <span class="stat-value" id="invDetValue">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Статус:</span>
+                <span class="stat-label" data-i18n="common.status">Status:</span>
                 <span class="stat-value" id="invStatus">-</span>
             </div>
         </div>
@@ -147,7 +147,7 @@
     <div class="tab-content" id="eigen-tab">
         <div class="matrix-setup">
             <div class="matrix-size-controls">
-                <label>Размер матрицы:</label>
+                <label data-i18n="matrix.matrixSize">Matrix size:</label>
                 <input type="number" id="eigenMatrixSize" value="3" min="2" max="5" onchange="updateEigenMatrix()">
                 <span>× </span>
                 <span id="eigenMatrixSizeDisplay">3</span>
@@ -155,25 +155,25 @@
         </div>
 
         <div class="matrix-input-section centered">
-            <h4>Матрица A</h4>
+            <h4 data-i18n="matrix.matrixA">Matrix A</h4>
             <div class="matrix-grid" id="eigenMatrixGrid"></div>
             <div class="matrix-quick-actions">
-                <button class="graph-btn small" onclick="fillEigenMatrixRandom()">Случайная</button>
-                <button class="graph-btn small" onclick="fillEigenMatrixSymmetric()">Симметричная</button>
+                <button class="graph-btn small" onclick="fillEigenMatrixRandom()" data-i18n="common.random">Random</button>
+                <button class="graph-btn small" onclick="fillEigenMatrixSymmetric()" data-i18n="matrix.symmetric">Symmetric</button>
             </div>
         </div>
 
         <div class="matrix-operations">
-            <button class="graph-btn primary" onclick="calculateEigenvalues()">Вычислить собств. числа</button>
+            <button class="graph-btn primary" onclick="calculateEigenvalues()" data-i18n="matrix.calculateEigen">Calculate eigenvalues</button>
         </div>
 
         <div class="stats-results" id="eigenResults">
             <div class="stat-item">
-                <span class="stat-label">Собственные числа:</span>
+                <span class="stat-label" data-i18n="matrix.eigenvaluesLabel">Eigenvalues:</span>
                 <span class="stat-value" id="eigenValues">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Trace (след):</span>
+                <span class="stat-label" data-i18n="matrix.trace">Trace:</span>
                 <span class="stat-value" id="eigenTrace">-</span>
             </div>
             <div class="stat-item">
@@ -181,7 +181,7 @@
                 <span class="stat-value" id="eigenDet">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Характеристический полином:</span>
+                <span class="stat-label" data-i18n="matrix.charPolynomial">Characteristic polynomial:</span>
                 <span class="stat-value" id="eigenPoly">-</span>
             </div>
         </div>
@@ -191,48 +191,48 @@
     <div class="tab-content" id="systems-tab">
         <div class="matrix-setup">
             <div class="matrix-size-controls">
-                <label>Число уравнений:</label>
+                <label data-i18n="matrix.numEquations">Number of equations:</label>
                 <input type="number" id="sysEquations" value="3" min="2" max="10" onchange="updateSystemMatrix()">
-                <label style="margin-left: 15px;">Число переменных:</label>
+                <label style="margin-left: 15px;" data-i18n="matrix.numVariables">Number of variables:</label>
                 <input type="number" id="sysVariables" value="3" min="2" max="10" onchange="updateSystemMatrix()">
             </div>
         </div>
 
-        <div class="system-info" style="margin: 10px 0; padding: 10px; background: var(--dark); border-radius: 8px; font-size: 12px; color: var(--text-secondary);">
-            Введите расширенную матрицу [A|b] системы Ax = b
+        <div class="system-info" style="margin: 10px 0; padding: 10px; background: var(--dark); border-radius: 8px; font-size: 12px; color: var(--text-secondary);" data-i18n="matrix.augmentedMatrixHint">
+            Enter augmented matrix [A|b] for system Ax = b
         </div>
 
         <div class="matrix-input-section centered">
-            <h4>Расширенная матрица [A|b]</h4>
+            <h4 data-i18n="matrix.augmentedMatrix">Augmented matrix [A|b]</h4>
             <div class="matrix-grid augmented" id="sysMatrixGrid"></div>
             <div class="matrix-quick-actions">
-                <button class="graph-btn small" onclick="fillSystemRandom()">Случайная</button>
-                <button class="graph-btn small" onclick="clearSystemMatrix()">Очистить</button>
+                <button class="graph-btn small" onclick="fillSystemRandom()" data-i18n="common.random">Random</button>
+                <button class="graph-btn small" onclick="clearSystemMatrix()" data-i18n="common.clear">Clear</button>
             </div>
         </div>
 
         <div class="matrix-operations">
-            <button class="graph-btn primary" onclick="solveSystem()">Решить систему</button>
-            <button class="graph-btn" onclick="showGaussSteps()">Шаги Гаусса</button>
+            <button class="graph-btn primary" onclick="solveSystem()" data-i18n="matrix.solveSystem">Solve system</button>
+            <button class="graph-btn" onclick="showGaussSteps()" data-i18n="matrix.gaussSteps">Gauss steps</button>
         </div>
 
         <div class="stats-results" id="sysResults">
             <div class="stat-item">
-                <span class="stat-label">Решение:</span>
+                <span class="stat-label" data-i18n="matrix.solution">Solution:</span>
                 <span class="stat-value" id="sysSolution">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Тип решения:</span>
+                <span class="stat-label" data-i18n="matrix.solutionType">Solution type:</span>
                 <span class="stat-value" id="sysSolutionType">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Ранг матрицы:</span>
+                <span class="stat-label" data-i18n="matrix.matrixRank">Matrix rank:</span>
                 <span class="stat-value" id="sysRank">-</span>
             </div>
         </div>
 
         <div class="gauss-steps" id="gaussSteps" style="display: none;">
-            <h4>Шаги метода Гаусса</h4>
+            <h4 data-i18n="matrix.gaussStepsTitle">Gaussian elimination steps</h4>
             <div class="steps-container" id="stepsContainer"></div>
         </div>
     </div>

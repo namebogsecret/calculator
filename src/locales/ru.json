@@ -1,0 +1,217 @@
+{
+  "app": {
+    "title": "Продвинутый графический калькулятор",
+    "loadError": "Ошибка загрузки калькулятора",
+    "loadErrorDesc": "Произошла ошибка при инициализации приложения."
+  },
+  "modes": {
+    "basic": "Основной",
+    "scientific": "Научный",
+    "graph": "Графики",
+    "statistics": "Статистика",
+    "matrix": "Матрицы"
+  },
+  "common": {
+    "fitScreen": "Подогнать под экран",
+    "calculate": "Рассчитать",
+    "clear": "Очистить",
+    "apply": "Применить",
+    "result": "Результат",
+    "random": "Случайная",
+    "identity": "Единичная",
+    "zero": "Нулевая",
+    "from": "От",
+    "to": "До",
+    "step": "Шаг",
+    "generate": "Создать",
+    "plot": "Построить",
+    "equation": "Уравнение:",
+    "status": "Статус:"
+  },
+  "graph": {
+    "tabs": {
+      "functions": "Функции",
+      "table": "Таблица",
+      "regression": "Регрессия",
+      "trace": "Трассировка"
+    },
+    "placeholder": "y = sin(x), x^2, 2*x+1",
+    "tablePlaceholder": "f(x) = x^2",
+    "xPlaceholder": "X: 1,2,3,4,5",
+    "yPlaceholder": "Y: 2,4,5,4,5",
+    "regressionTypes": {
+      "linear": "Линейная",
+      "quadratic": "Квадратичная",
+      "exponential": "Экспоненциальная",
+      "logarithmic": "Логарифмическая",
+      "power": "Степенная"
+    },
+    "correlationR": "Корреляция r:",
+    "cursorCoords": "Координаты курсора:",
+    "functionValue": "Значение функции:",
+    "traceHint": "Используйте мышь для трассировки графика"
+  },
+  "statistics": {
+    "tabs": {
+      "oneVar": "1-Var Stats",
+      "twoVar": "2-Var Stats",
+      "distributions": "Распределения",
+      "tests": "Тесты"
+    },
+    "inputPlaceholder": "Введите числа через запятую, пробел или с новой строки\nНапример: 1, 2, 3, 4, 5",
+    "histogram": "Гистограмма",
+    "boxPlot": "Box Plot",
+    "scatterPlot": "Scatter Plot",
+    "labels": {
+      "count": "n (Количество):",
+      "mean": "x̄ (Среднее):",
+      "sumX": "Σx:",
+      "sumXSq": "Σx²:",
+      "stdDev": "s (Станд. откл.):",
+      "popStdDev": "σ (Попул. ст.откл.):",
+      "minimum": "Минимум:",
+      "q1": "Q₁:",
+      "median": "Медиана:",
+      "q3": "Q₃:",
+      "maximum": "Максимум:",
+      "iqr": "IQR:",
+      "n": "n:",
+      "meanX": "x̄:",
+      "meanY": "ȳ:",
+      "sumXY": "Σxy:",
+      "correlation": "r (корреляция):",
+      "regressionLine": "Линия регрессии:"
+    },
+    "distributions": {
+      "normal": "Нормальное",
+      "binomial": "Биномиальное",
+      "poisson": "Пуассона",
+      "exponential": "Экспоненциальное",
+      "uniform": "Равномерное",
+      "parameters": "Параметры:",
+      "normalHelp": "Нормальное: μ (среднее), σ (станд.откл.)",
+      "binomialHelp": "Биномиальное: n (число испытаний), p (вероятность)",
+      "poissonHelp": "Пуассона: λ (среднее число событий)",
+      "exponentialHelp": "Экспоненциальное: λ (интенсивность)",
+      "uniformHelp": "Равномерное: a (мин), b (макс)",
+      "expectedValue": "Мат. ожидание:",
+      "variance": "Дисперсия:"
+    },
+    "tests": {
+      "dataFormat": "Формат данных:",
+      "ttestHelp": "T-Test: числа через запятую (тест против μ₀=0)",
+      "ztestHelp": "Z-Test: числа через запятую (тест против μ₀=0)",
+      "chi2Help": "χ² Test: наблюд. значения (1 строка) или набл./ожид. (2 строки)",
+      "anovaHelp": "ANOVA: каждая группа на новой строке",
+      "performTest": "Выполнить тест",
+      "statistic": "Статистика:",
+      "pValue": "p-value:",
+      "conclusion": "Вывод:",
+      "inputPlaceholder": "Введите числа через запятую: 1, 2, 3, 4, 5",
+      "rejectH0": "Отклонить H₀ (p < 0.05)",
+      "failRejectH0": "Не отклонять H₀ (p ≥ 0.05)"
+    }
+  },
+  "matrix": {
+    "tabs": {
+      "operations": "Операции",
+      "determinant": "Детерминант",
+      "inverse": "Обратная",
+      "eigenvalues": "Собств. числа",
+      "systems": "СЛАУ"
+    },
+    "matrixA": "Матрица A:",
+    "matrixB": "Матрица B:",
+    "matrixSize": "Размер матрицы:",
+    "numEquations": "Число уравнений:",
+    "numVariables": "Число переменных:",
+    "scalarK": "Скаляр k:",
+    "symmetric": "Симметричная",
+    "calculateDet": "Вычислить det(A)",
+    "determinantLabel": "Определитель det(A):",
+    "matrixType": "Матрица:",
+    "sourceMatrix": "Исходная матрица A",
+    "calculateInverse": "Вычислить A<sup>-1</sup>",
+    "inverseMatrix": "Обратная матрица A<sup>-1</sup>",
+    "calculateEigen": "Вычислить собств. числа",
+    "eigenvaluesLabel": "Собственные числа:",
+    "trace": "Trace (след):",
+    "charPolynomial": "Характеристический полином:",
+    "augmentedMatrixHint": "Введите расширенную матрицу [A|b] системы Ax = b",
+    "augmentedMatrix": "Расширенная матрица [A|b]",
+    "solveSystem": "Решить систему",
+    "gaussSteps": "Шаги Гаусса",
+    "solution": "Решение:",
+    "solutionType": "Тип решения:",
+    "matrixRank": "Ранг матрицы:",
+    "gaussStepsTitle": "Шаги метода Гаусса",
+    "matrixTypes": {
+      "singular": "Вырожденная (сингулярная)",
+      "unimodular": "Унимодулярная (det = 1)",
+      "detMinusOne": "det = -1",
+      "nonSingular": "Невырожденная"
+    },
+    "solutionTypes": {
+      "noSolution": "Нет решений",
+      "inconsistent": "Несовместная система",
+      "unique": "Единственное решение",
+      "infinite": "Бесконечно много решений",
+      "freeVariables": "Свободные переменные:"
+    },
+    "errors": {
+      "sameSizeAdd": "Матрицы должны иметь одинаковый размер для сложения",
+      "sameSizeSubtract": "Матрицы должны иметь одинаковый размер для вычитания",
+      "cannotMultiply": "Невозможно умножить: {rows1}×{cols1} на {rows2}×{cols2}",
+      "detSquare": "Определитель существует только для квадратных матриц",
+      "invSquare": "Обратная матрица существует только для квадратных матриц",
+      "singularMatrix": "Матрица вырожденная (det = 0), обратной не существует",
+      "traceSquare": "След существует только для квадратных матриц",
+      "eigenSquare": "Собственные числа существуют только для квадратных матриц",
+      "noInverse": "Обратной матрицы не существует (det = 0)",
+      "inverseFound": "Обратная матрица найдена",
+      "usePowerMethod": "Используйте численные методы для матриц > 3×3"
+    }
+  },
+  "notifications": {
+    "success": {
+      "init": "Калькулятор успешно инициализирован",
+      "plotted": "Функция успешно построена",
+      "statsCalculated": "Статистика успешно рассчитана",
+      "regressionComplete": "Регрессионный анализ завершен",
+      "tableGenerated": "Таблица функции создана",
+      "exported": "Данные успешно экспортированы",
+      "imported": "Данные успешно импортированы",
+      "graphCleared": "График очищен",
+      "detCalculated": "Определитель вычислен",
+      "inverseCalculated": "Обратная матрица вычислена",
+      "eigenCalculated": "Собственные числа вычислены",
+      "systemSolved": "Система решена",
+      "distributionCalculated": "Распределение рассчитано",
+      "testPerformed": "Тест выполнен",
+      "twoVarCalculated": "Статистика рассчитана"
+    },
+    "error": {
+      "plotFunction": "Ошибка построения функции: {message}",
+      "calculateStats": "Ошибка расчета статистики: {message}",
+      "regression": "Ошибка регрессионного анализа: {message}",
+      "fillParams": "Заполните все параметры таблицы",
+      "generateTable": "Ошибка создания таблицы: {message}",
+      "import": "Ошибка импорта: {message}",
+      "noNumbers": "Не найдено допустимых чисел",
+      "sameLength": "X и Y должны иметь одинаковую длину (мин. 2 точки)",
+      "invalidFunction": "Недопустимая функция",
+      "calculateFirst": "Сначала рассчитайте статистику",
+      "enterXY": "Введите данные X и Y",
+      "min2Values": "Нужно минимум 2 значения",
+      "enterXValue": "Введите значение x",
+      "enterTestData": "Введите данные для теста",
+      "sameObsExp": "Наблюдаемые и ожидаемые значения должны иметь одинаковую длину",
+      "min2Groups": "Нужно минимум 2 группы (каждая на новой строке)",
+      "calcError": "Ошибка расчета: {message}"
+    }
+  },
+  "charts": {
+    "histogram": "Гистограмма",
+    "boxPlot": "Box Plot"
+  }
+}

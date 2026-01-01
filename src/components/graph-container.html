@@ -1,17 +1,17 @@
 <div class="graph-container" id="graphContainer">
     <div class="graph-tabs">
-        <button class="tab-btn active" onclick="switchGraphTab('function')">Функции</button>
-        <button class="tab-btn" onclick="switchGraphTab('table')">Таблица</button>
-        <button class="tab-btn" onclick="switchGraphTab('regression')">Регрессия</button>
-        <button class="tab-btn" onclick="switchGraphTab('trace')">Трассировка</button>
+        <button class="tab-btn active" onclick="switchGraphTab('function')" data-i18n="graph.tabs.functions">Functions</button>
+        <button class="tab-btn" onclick="switchGraphTab('table')" data-i18n="graph.tabs.table">Table</button>
+        <button class="tab-btn" onclick="switchGraphTab('regression')" data-i18n="graph.tabs.regression">Regression</button>
+        <button class="tab-btn" onclick="switchGraphTab('trace')" data-i18n="graph.tabs.trace">Trace</button>
     </div>
 
     <div class="tab-content active" id="function-tab">
         <canvas id="graph-canvas"></canvas>
         <div class="graph-controls">
-            <input type="text" class="graph-input" id="functionInput" placeholder="y = sin(x), x^2, 2*x+1">
-            <button class="graph-btn" onclick="plotGraph()">Построить</button>
-            <button class="graph-btn" onclick="clearGraph()">Очистить</button>
+            <input type="text" class="graph-input" id="functionInput" data-i18n-placeholder="graph.placeholder" placeholder="y = sin(x), x^2, 2*x+1">
+            <button class="graph-btn" onclick="plotGraph()" data-i18n="common.plot">Plot</button>
+            <button class="graph-btn" onclick="clearGraph()" data-i18n="common.clear">Clear</button>
             <div class="zoom-controls">
                 <button class="graph-btn zoom-btn" onclick="zoomIn()">+</button>
                 <button class="graph-btn zoom-btn" onclick="zoomOut()">−</button>
@@ -22,11 +22,11 @@
 
     <div class="tab-content" id="table-tab">
         <div class="graph-controls">
-            <input type="text" class="graph-input" id="tableFunction" placeholder="f(x) = x^2">
-            <input type="number" class="graph-input" id="tableStart" placeholder="От" value="-5" style="max-width: 100px;">
-            <input type="number" class="graph-input" id="tableEnd" placeholder="До" value="5" style="max-width: 100px;">
-            <input type="number" class="graph-input" id="tableStep" placeholder="Шаг" value="0.5" style="max-width: 100px;">
-            <button class="graph-btn" onclick="generateTable()">Создать</button>
+            <input type="text" class="graph-input" id="tableFunction" data-i18n-placeholder="graph.tablePlaceholder" placeholder="f(x) = x^2">
+            <input type="number" class="graph-input" id="tableStart" data-i18n-placeholder="common.from" placeholder="From" value="-5" style="max-width: 100px;">
+            <input type="number" class="graph-input" id="tableEnd" data-i18n-placeholder="common.to" placeholder="To" value="5" style="max-width: 100px;">
+            <input type="number" class="graph-input" id="tableStep" data-i18n-placeholder="common.step" placeholder="Step" value="0.5" style="max-width: 100px;">
+            <button class="graph-btn" onclick="generateTable()" data-i18n="common.generate">Generate</button>
         </div>
         <div class="table-container">
             <table class="value-table" id="valueTable">
@@ -53,20 +53,20 @@
             </div>
         </div>
         <div class="graph-controls">
-            <input type="text" class="graph-input" id="xValues" placeholder="X: 1,2,3,4,5">
-            <input type="text" class="graph-input" id="yValues" placeholder="Y: 2,4,5,4,5">
+            <input type="text" class="graph-input" id="xValues" data-i18n-placeholder="graph.xPlaceholder" placeholder="X: 1,2,3,4,5">
+            <input type="text" class="graph-input" id="yValues" data-i18n-placeholder="graph.yPlaceholder" placeholder="Y: 2,4,5,4,5">
             <select class="regression-select" id="regressionType">
-                <option value="linear">Линейная</option>
-                <option value="quadratic">Квадратичная</option>
-                <option value="exponential">Экспоненциальная</option>
-                <option value="logarithmic">Логарифмическая</option>
-                <option value="power">Степенная</option>
+                <option value="linear" data-i18n="graph.regressionTypes.linear">Linear</option>
+                <option value="quadratic" data-i18n="graph.regressionTypes.quadratic">Quadratic</option>
+                <option value="exponential" data-i18n="graph.regressionTypes.exponential">Exponential</option>
+                <option value="logarithmic" data-i18n="graph.regressionTypes.logarithmic">Logarithmic</option>
+                <option value="power" data-i18n="graph.regressionTypes.power">Power</option>
             </select>
-            <button class="graph-btn" onclick="calculateRegression()">Рассчитать</button>
+            <button class="graph-btn" onclick="calculateRegression()" data-i18n="common.calculate">Calculate</button>
         </div>
         <div class="stats-results" id="regressionResults">
             <div class="stat-item">
-                <span class="stat-label">Уравнение:</span>
+                <span class="stat-label" data-i18n="common.equation">Equation:</span>
                 <span class="stat-value" id="regEquation">-</span>
             </div>
             <div class="stat-item">
@@ -74,7 +74,7 @@
                 <span class="stat-value" id="regR2">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Корреляция r:</span>
+                <span class="stat-label" data-i18n="graph.correlationR">Correlation r:</span>
                 <span class="stat-value" id="regR">-</span>
             </div>
         </div>
@@ -83,15 +83,15 @@
     <div class="tab-content" id="trace-tab">
         <div class="stats-results" style="display: block;">
             <div class="stat-item">
-                <span class="stat-label">Координаты курсора:</span>
+                <span class="stat-label" data-i18n="graph.cursorCoords">Cursor coordinates:</span>
                 <span class="stat-value" id="traceCoords">x: 0, y: 0</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Значение функции:</span>
+                <span class="stat-label" data-i18n="graph.functionValue">Function value:</span>
                 <span class="stat-value" id="traceValue">-</span>
             </div>
-            <p style="margin-top: 10px; color: var(--text-secondary);">
-                Используйте мышь для трассировки графика
+            <p style="margin-top: 10px; color: var(--text-secondary);" data-i18n="graph.traceHint">
+                Use mouse to trace the graph
             </p>
         </div>
     </div>
