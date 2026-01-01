@@ -1,65 +1,65 @@
 <div class="statistics-container" id="statisticsContainer">
     <div class="graph-tabs">
-        <button class="tab-btn active" onclick="switchStatsTab('onevar')">1-Var Stats</button>
-        <button class="tab-btn" onclick="switchStatsTab('twovar')">2-Var Stats</button>
-        <button class="tab-btn" onclick="switchStatsTab('distributions')">Распределения</button>
-        <button class="tab-btn" onclick="switchStatsTab('tests')">Тесты</button>
+        <button class="tab-btn active" onclick="switchStatsTab('onevar')" data-i18n="statistics.tabs.oneVar">1-Var Stats</button>
+        <button class="tab-btn" onclick="switchStatsTab('twovar')" data-i18n="statistics.tabs.twoVar">2-Var Stats</button>
+        <button class="tab-btn" onclick="switchStatsTab('distributions')" data-i18n="statistics.tabs.distributions">Distributions</button>
+        <button class="tab-btn" onclick="switchStatsTab('tests')" data-i18n="statistics.tabs.tests">Tests</button>
     </div>
 
     <div class="tab-content active" id="onevar-tab">
-        <textarea class="stats-input" id="statsInput" placeholder="Введите числа через запятую, пробел или с новой строки&#10;Например: 1, 2, 3, 4, 5"></textarea>
+        <textarea class="stats-input" id="statsInput" data-i18n-placeholder="statistics.inputPlaceholder" placeholder="Enter numbers separated by comma, space, or newline&#10;Example: 1, 2, 3, 4, 5"></textarea>
         <div class="stats-controls">
-            <button class="graph-btn" onclick="calculateStatistics()">Рассчитать</button>
-            <button class="graph-btn" onclick="showHistogram()">Гистограмма</button>
-            <button class="graph-btn" onclick="showBoxPlot()">Box Plot</button>
+            <button class="graph-btn" onclick="calculateStatistics()" data-i18n="common.calculate">Calculate</button>
+            <button class="graph-btn" onclick="showHistogram()" data-i18n="statistics.histogram">Histogram</button>
+            <button class="graph-btn" onclick="showBoxPlot()" data-i18n="statistics.boxPlot">Box Plot</button>
         </div>
         <div class="stats-results" id="statsResults">
             <div class="stat-item">
-                <span class="stat-label">n (Количество):</span>
+                <span class="stat-label" data-i18n="statistics.labels.count">n (Count):</span>
                 <span class="stat-value" id="statCount">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">x̄ (Среднее):</span>
+                <span class="stat-label" data-i18n="statistics.labels.mean">x̄ (Mean):</span>
                 <span class="stat-value" id="statMean">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Σx:</span>
+                <span class="stat-label" data-i18n="statistics.labels.sumX">Σx:</span>
                 <span class="stat-value" id="statSum">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Σx²:</span>
+                <span class="stat-label" data-i18n="statistics.labels.sumXSq">Σx²:</span>
                 <span class="stat-value" id="statSumSq">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">s (Станд. откл.):</span>
+                <span class="stat-label" data-i18n="statistics.labels.stdDev">s (Std. Dev.):</span>
                 <span class="stat-value" id="statStdDev">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">σ (Попул. ст.откл.):</span>
+                <span class="stat-label" data-i18n="statistics.labels.popStdDev">σ (Pop. Std. Dev.):</span>
                 <span class="stat-value" id="statPopStdDev">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Минимум:</span>
+                <span class="stat-label" data-i18n="statistics.labels.minimum">Minimum:</span>
                 <span class="stat-value" id="statMin">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Q₁:</span>
+                <span class="stat-label" data-i18n="statistics.labels.q1">Q₁:</span>
                 <span class="stat-value" id="statQ1">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Медиана:</span>
+                <span class="stat-label" data-i18n="statistics.labels.median">Median:</span>
                 <span class="stat-value" id="statMedian">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Q₃:</span>
+                <span class="stat-label" data-i18n="statistics.labels.q3">Q₃:</span>
                 <span class="stat-value" id="statQ3">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Максимум:</span>
+                <span class="stat-label" data-i18n="statistics.labels.maximum">Maximum:</span>
                 <span class="stat-value" id="statMax">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">IQR:</span>
+                <span class="stat-label" data-i18n="statistics.labels.iqr">IQR:</span>
                 <span class="stat-value" id="statIQR">-</span>
             </div>
         </div>
@@ -68,34 +68,34 @@
 
     <div class="tab-content" id="twovar-tab">
         <div class="stats-controls">
-            <input type="text" class="graph-input" id="xStatsValues" placeholder="X: 1,2,3,4,5">
-            <input type="text" class="graph-input" id="yStatsValues" placeholder="Y: 2,4,5,4,5">
-            <button class="graph-btn" onclick="calculateTwoVarStats()">Рассчитать</button>
-            <button class="graph-btn" onclick="showScatterPlot()">Scatter Plot</button>
+            <input type="text" class="graph-input" id="xStatsValues" data-i18n-placeholder="graph.xPlaceholder" placeholder="X: 1,2,3,4,5">
+            <input type="text" class="graph-input" id="yStatsValues" data-i18n-placeholder="graph.yPlaceholder" placeholder="Y: 2,4,5,4,5">
+            <button class="graph-btn" onclick="calculateTwoVarStats()" data-i18n="common.calculate">Calculate</button>
+            <button class="graph-btn" onclick="showScatterPlot()" data-i18n="statistics.scatterPlot">Scatter Plot</button>
         </div>
         <div class="stats-results" id="twoVarResults">
             <div class="stat-item">
-                <span class="stat-label">n:</span>
+                <span class="stat-label" data-i18n="statistics.labels.n">n:</span>
                 <span class="stat-value" id="twoVarN">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">x̄:</span>
+                <span class="stat-label" data-i18n="statistics.labels.meanX">x̄:</span>
                 <span class="stat-value" id="twoVarMeanX">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">ȳ:</span>
+                <span class="stat-label" data-i18n="statistics.labels.meanY">ȳ:</span>
                 <span class="stat-value" id="twoVarMeanY">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Σxy:</span>
+                <span class="stat-label" data-i18n="statistics.labels.sumXY">Σxy:</span>
                 <span class="stat-value" id="twoVarSumXY">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">r (корреляция):</span>
+                <span class="stat-label" data-i18n="statistics.labels.correlation">r (correlation):</span>
                 <span class="stat-value" id="twoVarR">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Линия регрессии:</span>
+                <span class="stat-label" data-i18n="statistics.labels.regressionLine">Regression line:</span>
                 <span class="stat-value" id="twoVarRegression">-</span>
             </div>
         </div>
@@ -103,16 +103,16 @@
 
     <div class="tab-content" id="distributions-tab">
         <div class="dist-help" style="margin-bottom: 15px; padding: 10px; background: var(--dark); border-radius: 8px; font-size: 12px; color: var(--text-secondary);">
-            <strong>Параметры:</strong>
-            <span id="distHelp">Нормальное: μ (среднее), σ (станд.откл.)</span>
+            <strong data-i18n="statistics.distributions.parameters">Parameters:</strong>
+            <span id="distHelp" data-i18n="statistics.distributions.normalHelp">Normal: μ (mean), σ (std. dev.)</span>
         </div>
         <div class="stats-controls">
             <select class="regression-select" id="distributionType" onchange="updateDistHelp()">
-                <option value="normal">Нормальное</option>
-                <option value="binomial">Биномиальное</option>
-                <option value="poisson">Пуассона</option>
-                <option value="exponential">Экспоненциальное</option>
-                <option value="uniform">Равномерное</option>
+                <option value="normal" data-i18n="statistics.distributions.normal">Normal</option>
+                <option value="binomial" data-i18n="statistics.distributions.binomial">Binomial</option>
+                <option value="poisson" data-i18n="statistics.distributions.poisson">Poisson</option>
+                <option value="exponential" data-i18n="statistics.distributions.exponential">Exponential</option>
+                <option value="uniform" data-i18n="statistics.distributions.uniform">Uniform</option>
             </select>
             <input type="number" class="graph-input" id="distParam1" placeholder="μ = 0" style="max-width: 120px;" step="any">
             <input type="number" class="graph-input" id="distParam2" placeholder="σ = 1" style="max-width: 120px;" step="any">
@@ -129,11 +129,11 @@
                 <span class="stat-value" id="distCDF">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Мат. ожидание:</span>
+                <span class="stat-label" data-i18n="statistics.distributions.expectedValue">Expected value:</span>
                 <span class="stat-value" id="distMean">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Дисперсия:</span>
+                <span class="stat-label" data-i18n="statistics.distributions.variance">Variance:</span>
                 <span class="stat-value" id="distVar">-</span>
             </div>
         </div>
@@ -141,8 +141,8 @@
 
     <div class="tab-content" id="tests-tab">
         <div class="test-help" style="margin-bottom: 15px; padding: 10px; background: var(--dark); border-radius: 8px; font-size: 12px; color: var(--text-secondary);">
-            <strong>Формат данных:</strong>
-            <span id="testHelp">T-Test: числа через запятую (тест против μ₀=0)</span>
+            <strong data-i18n="statistics.tests.dataFormat">Data format:</strong>
+            <span id="testHelp" data-i18n="statistics.tests.ttestHelp">T-Test: numbers separated by comma (test against μ₀=0)</span>
         </div>
         <div class="stats-controls">
             <select class="regression-select" id="testType" onchange="updateTestHelp()">
@@ -151,20 +151,20 @@
                 <option value="chi2">χ² Test</option>
                 <option value="anova">ANOVA</option>
             </select>
-            <button class="graph-btn" onclick="performTest()">Выполнить тест</button>
+            <button class="graph-btn" onclick="performTest()" data-i18n="statistics.tests.performTest">Perform test</button>
         </div>
-        <textarea class="stats-input" id="testInput" placeholder="Введите числа через запятую: 1, 2, 3, 4, 5"></textarea>
+        <textarea class="stats-input" id="testInput" data-i18n-placeholder="statistics.tests.inputPlaceholder" placeholder="Enter numbers separated by comma: 1, 2, 3, 4, 5"></textarea>
         <div class="stats-results" id="testResults">
             <div class="stat-item">
-                <span class="stat-label">Статистика:</span>
+                <span class="stat-label" data-i18n="statistics.tests.statistic">Statistic:</span>
                 <span class="stat-value" id="testStat">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">p-value:</span>
+                <span class="stat-label" data-i18n="statistics.tests.pValue">p-value:</span>
                 <span class="stat-value" id="testPValue">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Вывод:</span>
+                <span class="stat-label" data-i18n="statistics.tests.conclusion">Conclusion:</span>
                 <span class="stat-value" id="testConclusion">-</span>
             </div>
         </div>
