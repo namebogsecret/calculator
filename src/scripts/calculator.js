@@ -37,24 +37,26 @@ export class Calculator {
     calculate() {
         try {
             const preparedExpression = prepareExpression(this.expression, this.angleMode);
-            const result = eval(preparedExpression);
-            
+            // Use Function constructor instead of eval() for better performance and security
+            const computeResult = new Function('return ' + preparedExpression);
+            const result = computeResult();
+
             if (!isValidNumber(result)) {
                 throw new Error('Invalid result');
             }
-            
+
             // Add to history
             this.addToHistory(this.expression, result);
-            
+
             // Update expression to result
             this.expression = result.toString();
-            
+
             return {
                 success: true,
                 result: result,
                 formattedResult: formatNumber(result)
             };
-            
+
         } catch (error) {
             return {
                 success: false,
@@ -70,12 +72,14 @@ export class Calculator {
     previewCalculation() {
         try {
             const preparedExpression = prepareExpression(this.expression, this.angleMode);
-            const result = eval(preparedExpression);
-            
+            // Use Function constructor instead of eval() for better performance and security
+            const computeResult = new Function('return ' + preparedExpression);
+            const result = computeResult();
+
             if (isValidNumber(result)) {
                 return formatNumber(result);
             }
-            
+
             return null;
         } catch (error) {
             return null;

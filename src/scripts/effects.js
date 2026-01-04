@@ -141,6 +141,8 @@ class ConfettiManager {
         this.particles = [];
         this.animationId = null;
         this.enabled = localStorage.getItem('confettiEnabled') !== 'false';
+        // Store bound resize handler for cleanup
+        this._boundResizeHandler = null;
     }
 
     init() {
@@ -159,7 +161,27 @@ class ConfettiManager {
         document.body.appendChild(this.canvas);
         this.ctx = this.canvas.getContext('2d');
         this.resize();
-        window.addEventListener('resize', () => this.resize());
+        // Store reference for cleanup
+        this._boundResizeHandler = () => this.resize();
+        window.addEventListener('resize', this._boundResizeHandler);
+    }
+
+    destroy() {
+        // Cleanup to prevent memory leaks
+        if (this._boundResizeHandler) {
+            window.removeEventListener('resize', this._boundResizeHandler);
+            this._boundResizeHandler = null;
+        }
+        if (this.animationId) {
+            cancelAnimationFrame(this.animationId);
+            this.animationId = null;
+        }
+        if (this.canvas && this.canvas.parentNode) {
+            this.canvas.parentNode.removeChild(this.canvas);
+        }
+        this.canvas = null;
+        this.ctx = null;
+        this.particles = [];
     }
 
     resize() {
@@ -424,6 +446,8 @@ class HapticManager {
 class KeyboardHighlighter {
     constructor() {
         this.enabled = true;
+        // Cached button references to avoid DOM queries on every keypress
+        this.buttonCache = new Map();
         this.keyMap = {
             '0': '[data-value="0"]',
             '1': '[data-value="1"]',
@@ -455,39 +479,59 @@ class KeyboardHighlighter {
     }
 
     init() {
+        // Pre-cache all button references on initialization
+        this._cacheButtons();
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
         document.addEventListener('keyup', (e) => this.handleKeyUp(e));
     }
 
-    handleKeyDown(e) {
-        if (!this.enabled) return;
+    _cacheButtons() {
+        // Cache DOM references for all keys to avoid queries on every keypress
+        for (const [key, selectors] of Object.entries(this.keyMap)) {
+            const selectorList = selectors.split(', ');
+            for (const selector of selectorList) {
+                const btn = document.querySelector(selector);
+                if (btn) {
+                    this.buttonCache.set(key, btn);
+                    break;
+                }
+            }
+        }
+    }
 
-        const selectors = this.keyMap[e.key];
-        if (!selectors) return;
+    _getButton(key) {
+        // Return cached button or try to find it
+        if (this.buttonCache.has(key)) {
+            return this.buttonCache.get(key);
+        }
+        // Button not in cache, try to find and cache it
+        const selectors = this.keyMap[key];
+        if (!selectors) return null;
 
         const selectorList = selectors.split(', ');
         for (const selector of selectorList) {
             const btn = document.querySelector(selector);
             if (btn) {
-                btn.classList.add('keyboard-active');
-                break;
+                this.buttonCache.set(key, btn);
+                return btn;
             }
+        }
+        return null;
+    }
+
+    handleKeyDown(e) {
+        if (!this.enabled) return;
+        const btn = this._getButton(e.key);
+        if (btn) {
+            btn.classList.add('keyboard-active');
         }
     }
 
     handleKeyUp(e) {
         if (!this.enabled) return;
-
-        const selectors = this.keyMap[e.key];
-        if (!selectors) return;
-
-        const selectorList = selectors.split(', ');
-        for (const selector of selectorList) {
-            const btn = document.querySelector(selector);
-            if (btn) {
-                btn.classList.remove('keyboard-active');
-                break;
-            }
+        const btn = this._getButton(e.key);
+        if (btn) {
+            btn.classList.remove('keyboard-active');
         }
     }
 

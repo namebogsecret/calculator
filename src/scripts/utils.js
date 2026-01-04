@@ -54,60 +54,118 @@ export function permutation(n, k) {
 }
 
 /**
- * Expression processing utilities
+ * Expression processing utilities with caching for performance
  */
+
+// Cache for prepared expressions to avoid repeated processing
+const expressionCache = new Map();
+const MAX_CACHE_SIZE = 100;
+
+// Pre-compiled replacement map for single-pass processing
+const FUNCTION_REPLACEMENTS = {
+    'asin': 'Math.asin',
+    'acos': 'Math.acos',
+    'atan': 'Math.atan',
+    'sinh': 'Math.sinh',
+    'cosh': 'Math.cosh',
+    'tanh': 'Math.tanh',
+    'sin': 'Math.sin',
+    'cos': 'Math.cos',
+    'tan': 'Math.tan',
+    'log': 'Math.log10',
+    'ln': 'Math.log',
+    'sqrt': 'Math.sqrt',
+    'cbrt': 'Math.cbrt',
+    'abs': 'Math.abs',
+    'exp': 'Math.exp',
+    'floor': 'Math.floor',
+    'ceil': 'Math.ceil',
+    'round': 'Math.round',
+    'pi': 'Math.PI'
+};
+
+// Create regex for all function names (sorted by length descending to match longer ones first)
+const FUNCTION_PATTERN = new RegExp(
+    '\\b(' + Object.keys(FUNCTION_REPLACEMENTS).sort((a, b) => b.length - a.length).join('|') + ')\\b',
+    'g'
+);
+
+// Operator replacements
+const OPERATOR_REPLACEMENTS = {
+    '^': '**',
+    '÷': '/',
+    '×': '*',
+    '−': '-'
+};
+
+const OPERATOR_PATTERN = /[\^÷×−]/g;
+
 export function prepareExpression(expr, angleMode = 'deg') {
-    let prepared = expr
-        .replace(/sin/g, 'Math.sin')
-        .replace(/cos/g, 'Math.cos')
-        .replace(/tan/g, 'Math.tan')
-        .replace(/aMath\.sin/g, 'Math.asin')
-        .replace(/aMath\.cos/g, 'Math.acos')
-        .replace(/aMath\.tan/g, 'Math.atan')
-        .replace(/log/g, 'Math.log10')
-        .replace(/ln/g, 'Math.log')
-        .replace(/sqrt/g, 'Math.sqrt')
-        .replace(/cbrt/g, 'Math.cbrt')
-        .replace(/abs/g, 'Math.abs')
-        .replace(/exp/g, 'Math.exp')
-        .replace(/floor/g, 'Math.floor')
-        .replace(/ceil/g, 'Math.ceil')
-        .replace(/round/g, 'Math.round')
-        .replace(/\^/g, '**')
-        .replace(/÷/g, '/')
-        .replace(/×/g, '*')
-        .replace(/−/g, '-')
-        .replace(/%/g, '%')
-        .replace(/pi/g, 'Math.PI')
-        .replace(/e/g, 'Math.E');
-    
+    // Check cache first
+    const cacheKey = `${expr}|${angleMode}`;
+    if (expressionCache.has(cacheKey)) {
+        return expressionCache.get(cacheKey);
+    }
+
+    // Single-pass function replacement
+    let prepared = expr.replace(FUNCTION_PATTERN, (match) => FUNCTION_REPLACEMENTS[match] || match);
+
+    // Handle 'e' separately to avoid replacing 'e' in other words
+    prepared = prepared.replace(/\be\b/g, 'Math.E');
+
+    // Operator replacements in single pass
+    prepared = prepared.replace(OPERATOR_PATTERN, (match) => OPERATOR_REPLACEMENTS[match] || match);
+
     // Handle factorial
     prepared = prepared.replace(/(\d+)!/g, (match, num) => factorial(parseInt(num)));
-    
+
     // Convert angles for trigonometric functions
     if (angleMode === 'deg') {
         prepared = prepared
-            .replace(/Math\.sin\((.*?)\)/g, (match, angle) => `Math.sin((${angle}) * Math.PI / 180)`)
-            .replace(/Math\.cos\((.*?)\)/g, (match, angle) => `Math.cos((${angle}) * Math.PI / 180)`)
-            .replace(/Math\.tan\((.*?)\)/g, (match, angle) => `Math.tan((${angle}) * Math.PI / 180)`);
+            .replace(/Math\.sin\(([^)]+)\)/g, (match, angle) => `Math.sin((${angle}) * Math.PI / 180)`)
+            .replace(/Math\.cos\(([^)]+)\)/g, (match, angle) => `Math.cos((${angle}) * Math.PI / 180)`)
+            .replace(/Math\.tan\(([^)]+)\)/g, (match, angle) => `Math.tan((${angle}) * Math.PI / 180)`);
     }
-    
+
+    // Manage cache size
+    if (expressionCache.size >= MAX_CACHE_SIZE) {
+        // Remove oldest entry
+        const firstKey = expressionCache.keys().next().value;
+        expressionCache.delete(firstKey);
+    }
+    expressionCache.set(cacheKey, prepared);
+
     return prepared;
 }
 
+// Cache for function expressions
+const functionExpressionCache = new Map();
+
 export function prepareFunctionExpression(funcStr) {
-    return funcStr
-        .replace(/f\(x\)\s*=\s*/, '')
-        .replace(/sin/g, 'Math.sin')
-        .replace(/cos/g, 'Math.cos')
-        .replace(/tan/g, 'Math.tan')
-        .replace(/log/g, 'Math.log10')
-        .replace(/ln/g, 'Math.log')
-        .replace(/sqrt/g, 'Math.sqrt')
-        .replace(/abs/g, 'Math.abs')
-        .replace(/\^/g, '**')
-        .replace(/pi/g, 'Math.PI')
-        .replace(/e/g, 'Math.E');
+    // Check cache first
+    if (functionExpressionCache.has(funcStr)) {
+        return functionExpressionCache.get(funcStr);
+    }
+
+    let prepared = funcStr.replace(/f\(x\)\s*=\s*/, '');
+
+    // Use the same single-pass replacement pattern
+    prepared = prepared.replace(FUNCTION_PATTERN, (match) => FUNCTION_REPLACEMENTS[match] || match);
+
+    // Handle 'e' separately
+    prepared = prepared.replace(/\be\b/g, 'Math.E');
+
+    // Operator replacement
+    prepared = prepared.replace(OPERATOR_PATTERN, (match) => OPERATOR_REPLACEMENTS[match] || match);
+
+    // Manage cache size
+    if (functionExpressionCache.size >= MAX_CACHE_SIZE) {
+        const firstKey = functionExpressionCache.keys().next().value;
+        functionExpressionCache.delete(firstKey);
+    }
+    functionExpressionCache.set(funcStr, prepared);
+
+    return prepared;
 }
 
 /**
@@ -150,11 +208,11 @@ export function quantile(sortedData, q) {
  * Random number generators
  */
 export function randomNormal(mu = 0, sigma = 1) {
-    // Box-Muller transform
-    let u = 0, v = 0;
-    while (u === 0) u = Math.random();
-    while (v === 0) v = Math.random();
-    
+    // Box-Muller transform with safe random value generation
+    // Use Math.max to avoid infinite loop risk when Math.random() returns 0
+    const u = Math.max(Number.MIN_VALUE, Math.random());
+    const v = Math.max(Number.MIN_VALUE, Math.random());
+
     return mu + sigma * Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
 }
 
@@ -208,33 +266,57 @@ export function erf(x) {
     return sign * y;
 }
 
+// Memoization cache for gamma function
+const gammaCache = new Map();
+const GAMMA_CACHE_SIZE = 200;
+
+// Pre-computed coefficients for gamma function
+const GAMMA_COEFFICIENTS = [
+    676.5203681218851,
+    -1259.1392167224028,
+    771.32342877765313,
+    -176.61502916214059,
+    12.507343278686905,
+    -0.13857109526572012,
+    9.9843695780195716e-6,
+    1.5056327351493116e-7
+];
+
+const SQRT_TWO_PI = Math.sqrt(2 * Math.PI);
+
 export function gamma(z) {
-    // Stirling's approximation
+    // Round to 10 decimal places for cache key
+    const cacheKey = Math.round(z * 1e10) / 1e10;
+
+    if (gammaCache.has(cacheKey)) {
+        return gammaCache.get(cacheKey);
+    }
+
+    let result;
+
+    // Reflection formula for z < 0.5
     if (z < 0.5) {
-        return Math.PI / (Math.sin(Math.PI * z) * gamma(1 - z));
+        result = Math.PI / (Math.sin(Math.PI * z) * gamma(1 - z));
+    } else {
+        z -= 1;
+        let x = 0.99999999999980993;
+
+        for (let i = 0; i < GAMMA_COEFFICIENTS.length; i++) {
+            x += GAMMA_COEFFICIENTS[i] / (z + i + 1);
+        }
+
+        const t = z + GAMMA_COEFFICIENTS.length - 0.5;
+        result = SQRT_TWO_PI * Math.pow(t, z + 0.5) * Math.exp(-t) * x;
     }
-    
-    z -= 1;
-    let x = 0.99999999999980993;
-    const coefficients = [
-        676.5203681218851,
-        -1259.1392167224028,
-        771.32342877765313,
-        -176.61502916214059,
-        12.507343278686905,
-        -0.13857109526572012,
-        9.9843695780195716e-6,
-        1.5056327351493116e-7
-    ];
-    
-    for (let i = 0; i < coefficients.length; i++) {
-        x += coefficients[i] / (z + i + 1);
+
+    // Manage cache size
+    if (gammaCache.size >= GAMMA_CACHE_SIZE) {
+        const firstKey = gammaCache.keys().next().value;
+        gammaCache.delete(firstKey);
     }
-    
-    const t = z + coefficients.length - 0.5;
-    const sqrtTwoPi = Math.sqrt(2 * Math.PI);
-    
-    return sqrtTwoPi * Math.pow(t, z + 0.5) * Math.exp(-t) * x;
+    gammaCache.set(cacheKey, result);
+
+    return result;
 }
 
 /**

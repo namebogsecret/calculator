@@ -95,10 +95,11 @@ function t(key, params = {}) {
         return key;
     }
 
-    // Interpolate parameters
+    // Interpolate parameters using simple string replacement (faster than RegExp)
     let result = value;
     for (const [param, val] of Object.entries(params)) {
-        result = result.replace(new RegExp(`{${param}}`, 'g'), val);
+        // Use split/join for global replacement - faster than creating RegExp in loop
+        result = result.split(`{${param}}`).join(val);
     }
 
     return result;
@@ -150,50 +151,56 @@ function getAvailableLocales() {
 }
 
 /**
- * Apply translations to all elements with data-i18n attribute
+ * Apply translations to all elements with data-i18n attributes
+ * Uses single DOM query for better performance
  */
 function applyTranslations() {
-    // Translate text content
-    document.querySelectorAll('[data-i18n]').forEach(element => {
-        const key = element.getAttribute('data-i18n');
-        const translation = t(key);
-        if (translation !== key) {
-            element.textContent = translation;
-        }
-    });
+    // Single DOM query to find all translatable elements
+    const translatableElements = document.querySelectorAll(
+        '[data-i18n], [data-i18n-placeholder], [data-i18n-title], [data-i18n-html]'
+    );
 
-    // Translate placeholders
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
-        const key = element.getAttribute('data-i18n-placeholder');
-        const translation = t(key);
-        if (translation !== key) {
-            element.placeholder = translation;
+    // Process all elements in single iteration
+    translatableElements.forEach(element => {
+        // Check each attribute type
+        const i18nKey = element.getAttribute('data-i18n');
+        if (i18nKey) {
+            const translation = t(i18nKey);
+            if (translation !== i18nKey) {
+                element.textContent = translation;
+            }
         }
-    });
 
-    // Translate titles/tooltips
-    document.querySelectorAll('[data-i18n-title]').forEach(element => {
-        const key = element.getAttribute('data-i18n-title');
-        const translation = t(key);
-        if (translation !== key) {
-            element.title = translation;
+        const placeholderKey = element.getAttribute('data-i18n-placeholder');
+        if (placeholderKey) {
+            const translation = t(placeholderKey);
+            if (translation !== placeholderKey) {
+                element.placeholder = translation;
+            }
         }
-    });
 
-    // Translate innerHTML (for elements with HTML content like <sup>)
-    document.querySelectorAll('[data-i18n-html]').forEach(element => {
-        const key = element.getAttribute('data-i18n-html');
-        const translation = t(key);
-        if (translation !== key) {
-            element.innerHTML = translation;
+        const titleKey = element.getAttribute('data-i18n-title');
+        if (titleKey) {
+            const translation = t(titleKey);
+            if (translation !== titleKey) {
+                element.title = translation;
+            }
+        }
+
+        const htmlKey = element.getAttribute('data-i18n-html');
+        if (htmlKey) {
+            const translation = t(htmlKey);
+            if (translation !== htmlKey) {
+                element.innerHTML = translation;
+            }
         }
     });
 
     // Update page title
-    const titleKey = 'app.title';
-    const title = t(titleKey);
-    if (title !== titleKey) {
-        document.title = title;
+    const pageTitleKey = 'app.title';
+    const pageTitle = t(pageTitleKey);
+    if (pageTitle !== pageTitleKey) {
+        document.title = pageTitle;
     }
 }
 

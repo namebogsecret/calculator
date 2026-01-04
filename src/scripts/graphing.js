@@ -21,7 +21,13 @@ export class GraphRenderer {
         this.isTracing = false;
         this.mouseX = 0;
         this.mouseY = 0;
-        
+
+        // Performance optimizations
+        this.pendingRedraw = null;
+        this.functionCache = new Map();
+        // Reusable touch data object to avoid allocations
+        this.touchStartData = { dragStartX: 0, dragStartY: 0 };
+
         this.setupEventListeners();
     }
 
@@ -91,9 +97,9 @@ export class GraphRenderer {
             if (e.touches.length === 1) {
                 this.isDragging = true;
                 const touch = e.touches[0];
-                const dragStartX = touch.clientX - this.offsetX;
-                const dragStartY = touch.clientY - this.offsetY;
-                this.touchStartData = { dragStartX, dragStartY };
+                // Reuse existing object to avoid allocation on every touch
+                this.touchStartData.dragStartX = touch.clientX - this.offsetX;
+                this.touchStartData.dragStartY = touch.clientY - this.offsetY;
             }
         });
 
@@ -228,39 +234,48 @@ export class GraphRenderer {
     }
 
     /**
-     * Plot all functions
+     * Plot all functions using adaptive sampling for better performance
      */
     plotFunctions() {
         const width = this.canvas.width;
         const height = this.canvas.height;
         const centerX = width / 2 + this.offsetX;
         const centerY = height / 2 + this.offsetY;
-        
+
+        // Adaptive sampling: use fewer points and let canvas interpolate
+        // Sample every 2-4 pixels instead of every pixel
+        const sampleStep = Math.max(2, Math.min(4, Math.floor(width / 250)));
+
         this.functions.forEach(({ func, color, visible }) => {
             if (!visible) return;
-            
+
             this.ctx.strokeStyle = color;
             this.ctx.lineWidth = GRAPH_CONFIG.LINE_WIDTH;
             this.ctx.shadowColor = color;
             this.ctx.shadowBlur = GRAPH_CONFIG.SHADOW_BLUR;
             this.ctx.beginPath();
-            
+
             let firstPoint = true;
-            
-            for (let px = 0; px < width; px++) {
+            let prevPy = 0;
+
+            for (let px = 0; px < width; px += sampleStep) {
                 const x = (px - centerX) / this.scale;
-                
+
                 try {
                     const y = func(x);
                     const py = centerY - y * this.scale;
-                    
+
                     if (isValidNumber(y) && Math.abs(y) < 1000000) {
-                        if (firstPoint) {
+                        // Check for discontinuities (large jumps)
+                        const isDiscontinuity = !firstPoint && Math.abs(py - prevPy) > height * 0.5;
+
+                        if (firstPoint || isDiscontinuity) {
                             this.ctx.moveTo(px, py);
                             firstPoint = false;
                         } else {
                             this.ctx.lineTo(px, py);
                         }
+                        prevPy = py;
                     } else {
                         firstPoint = true;
                     }
@@ -268,7 +283,7 @@ export class GraphRenderer {
                     firstPoint = true;
                 }
             }
-            
+
             this.ctx.stroke();
             this.ctx.shadowBlur = 0;
         });
@@ -455,9 +470,30 @@ export class GraphRenderer {
     }
 
     /**
-     * Complete redraw
+     * Complete redraw with requestAnimationFrame batching
      */
     redraw() {
+        // Cancel any pending redraw to batch multiple calls
+        if (this.pendingRedraw) {
+            cancelAnimationFrame(this.pendingRedraw);
+        }
+
+        this.pendingRedraw = requestAnimationFrame(() => {
+            this.pendingRedraw = null;
+            this.drawGrid();
+            this.plotFunctions();
+            this.plotDataPoints();
+        });
+    }
+
+    /**
+     * Immediate redraw without batching (for initialization)
+     */
+    redrawImmediate() {
+        if (this.pendingRedraw) {
+            cancelAnimationFrame(this.pendingRedraw);
+            this.pendingRedraw = null;
+        }
         this.drawGrid();
         this.plotFunctions();
         this.plotDataPoints();
