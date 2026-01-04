@@ -200,29 +200,45 @@ export class ProbabilityDistributions {
     }
 
     /**
-     * Helper functions for distributions
+     * Helper functions for distributions with adaptive iteration
      */
     static gammaIncomplete(x, a) {
-        // Simplified incomplete gamma function
+        // Simplified incomplete gamma function with adaptive termination
+        const maxIterations = 100;
+        const tolerance = 1e-10;
         let sum = 0;
-        for (let k = 0; k < 100; k++) {
+        let prevSum = -1;
+
+        for (let k = 0; k < maxIterations; k++) {
             const term = Math.pow(x, k) * Math.exp(-x) / factorial(k);
             sum += term;
-            if (Math.abs(term) < 1e-10) break;
+            // Early termination when sum stabilizes or term is negligible
+            if (Math.abs(term) < tolerance || Math.abs(sum - prevSum) < tolerance) {
+                break;
+            }
+            prevSum = sum;
         }
         return sum;
     }
 
     static betaIncomplete(x, a, b) {
-        // Simplified incomplete beta function
+        // Simplified incomplete beta function with adaptive termination
         if (x < 0 || x > 1) return 0;
-        
+
+        const maxIterations = 100;
+        const tolerance = 1e-10;
         let sum = 0;
-        for (let k = 0; k < 100; k++) {
-            const term = Math.pow(x, a + k) * Math.pow(1 - x, b) / 
+        let prevSum = -1;
+
+        for (let k = 0; k < maxIterations; k++) {
+            const term = Math.pow(x, a + k) * Math.pow(1 - x, b) /
                         (factorial(k) * (a + k));
             sum += term;
-            if (Math.abs(term) < 1e-10) break;
+            // Early termination when sum stabilizes or term is negligible
+            if (Math.abs(term) < tolerance || Math.abs(sum - prevSum) < tolerance) {
+                break;
+            }
+            prevSum = sum;
         }
         return sum;
     }
@@ -372,7 +388,7 @@ export class FinancialFunctions {
 }
 
 /**
- * Matrix operations (basic)
+ * Matrix operations with optimized algorithms
  */
 export class Matrix {
     constructor(data) {
@@ -380,12 +396,12 @@ export class Matrix {
         this.rows = data.length;
         this.cols = data[0].length;
     }
-    
+
     multiply(other) {
         if (this.cols !== other.rows) {
             throw new Error('Matrix dimensions incompatible for multiplication');
         }
-        
+
         const result = [];
         for (let i = 0; i < this.rows; i++) {
             result[i] = [];
@@ -397,10 +413,10 @@ export class Matrix {
                 result[i][j] = sum;
             }
         }
-        
+
         return new Matrix(result);
     }
-    
+
     transpose() {
         const result = [];
         for (let j = 0; j < this.cols; j++) {
@@ -411,26 +427,66 @@ export class Matrix {
         }
         return new Matrix(result);
     }
-    
+
+    /**
+     * Calculate determinant using LU decomposition - O(n³) instead of O(n!)
+     */
     determinant() {
         if (this.rows !== this.cols) {
             throw new Error('Matrix must be square to calculate determinant');
         }
-        
-        if (this.rows === 2) {
+
+        const n = this.rows;
+
+        // Special case for small matrices
+        if (n === 1) {
+            return this.data[0][0];
+        }
+        if (n === 2) {
             return this.data[0][0] * this.data[1][1] - this.data[0][1] * this.data[1][0];
         }
-        
-        // For larger matrices, implement recursive determinant calculation
-        let det = 0;
-        for (let col = 0; col < this.cols; col++) {
-            const subMatrix = this.getSubMatrix(0, col);
-            det += Math.pow(-1, col) * this.data[0][col] * subMatrix.determinant();
+
+        // LU decomposition with partial pivoting
+        // Create a copy of the matrix
+        const matrix = this.data.map(row => [...row]);
+        let det = 1;
+        let swaps = 0;
+
+        for (let col = 0; col < n; col++) {
+            // Find pivot
+            let maxRow = col;
+            for (let row = col + 1; row < n; row++) {
+                if (Math.abs(matrix[row][col]) > Math.abs(matrix[maxRow][col])) {
+                    maxRow = row;
+                }
+            }
+
+            // Swap rows if needed
+            if (maxRow !== col) {
+                [matrix[col], matrix[maxRow]] = [matrix[maxRow], matrix[col]];
+                swaps++;
+            }
+
+            // Check for zero pivot
+            if (Math.abs(matrix[col][col]) < 1e-10) {
+                return 0; // Matrix is singular
+            }
+
+            // Eliminate below
+            for (let row = col + 1; row < n; row++) {
+                const factor = matrix[row][col] / matrix[col][col];
+                for (let j = col; j < n; j++) {
+                    matrix[row][j] -= factor * matrix[col][j];
+                }
+            }
+
+            det *= matrix[col][col];
         }
-        
-        return det;
+
+        // Apply sign change for row swaps
+        return swaps % 2 === 0 ? det : -det;
     }
-    
+
     getSubMatrix(skipRow, skipCol) {
         const subData = [];
         for (let i = 0; i < this.rows; i++) {
@@ -444,26 +500,78 @@ export class Matrix {
         }
         return new Matrix(subData);
     }
-    
+
+    /**
+     * Calculate inverse using Gauss-Jordan elimination - O(n³)
+     */
     inverse() {
         if (this.rows !== this.cols) {
             throw new Error('Matrix must be square to calculate inverse');
         }
-        
-        const det = this.determinant();
-        if (Math.abs(det) < 1e-10) {
-            throw new Error('Matrix is singular and cannot be inverted');
-        }
-        
-        if (this.rows === 2) {
+
+        const n = this.rows;
+
+        // Special case for 2x2
+        if (n === 2) {
+            const det = this.data[0][0] * this.data[1][1] - this.data[0][1] * this.data[1][0];
+            if (Math.abs(det) < 1e-10) {
+                throw new Error('Matrix is singular and cannot be inverted');
+            }
             return new Matrix([
                 [this.data[1][1] / det, -this.data[0][1] / det],
                 [-this.data[1][0] / det, this.data[0][0] / det]
             ]);
         }
-        
-        // For larger matrices, more complex implementation needed
-        throw new Error('Inverse calculation only implemented for 2x2 matrices');
+
+        // Create augmented matrix [A|I]
+        const augmented = [];
+        for (let i = 0; i < n; i++) {
+            augmented[i] = [...this.data[i]];
+            for (let j = 0; j < n; j++) {
+                augmented[i].push(i === j ? 1 : 0);
+            }
+        }
+
+        // Gauss-Jordan elimination
+        for (let col = 0; col < n; col++) {
+            // Find pivot
+            let maxRow = col;
+            for (let row = col + 1; row < n; row++) {
+                if (Math.abs(augmented[row][col]) > Math.abs(augmented[maxRow][col])) {
+                    maxRow = row;
+                }
+            }
+
+            [augmented[col], augmented[maxRow]] = [augmented[maxRow], augmented[col]];
+
+            if (Math.abs(augmented[col][col]) < 1e-10) {
+                throw new Error('Matrix is singular and cannot be inverted');
+            }
+
+            // Scale pivot row
+            const pivot = augmented[col][col];
+            for (let j = 0; j < 2 * n; j++) {
+                augmented[col][j] /= pivot;
+            }
+
+            // Eliminate column
+            for (let row = 0; row < n; row++) {
+                if (row !== col) {
+                    const factor = augmented[row][col];
+                    for (let j = 0; j < 2 * n; j++) {
+                        augmented[row][j] -= factor * augmented[col][j];
+                    }
+                }
+            }
+        }
+
+        // Extract inverse from augmented matrix
+        const result = [];
+        for (let i = 0; i < n; i++) {
+            result[i] = augmented[i].slice(n);
+        }
+
+        return new Matrix(result);
     }
 }
 

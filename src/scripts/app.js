@@ -372,36 +372,47 @@ class CalculatorApp {
      * UI setup methods
      */
     setupModeButtons() {
-        document.querySelectorAll('.mode-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const mode = e.target.dataset.mode;
+        // Use event delegation on parent container instead of individual listeners
+        const modeContainer = document.querySelector('.mode-buttons') || document.body;
+        modeContainer.addEventListener('click', (e) => {
+            const btn = e.target.closest('.mode-btn');
+            if (btn) {
+                const mode = btn.dataset.mode;
                 if (mode) {
                     this.modeManager.setMode(mode);
                 }
-            });
+            }
         });
     }
 
     setupTabButtons() {
-        // Graph tabs
-        document.querySelectorAll('#graphContainer .tab-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const tab = e.target.dataset.tab;
-                if (tab) {
-                    this.tabManagers.graph.switchTab(tab, e);
+        // Use event delegation for graph tabs
+        const graphContainer = document.getElementById('graphContainer');
+        if (graphContainer) {
+            graphContainer.addEventListener('click', (e) => {
+                const btn = e.target.closest('.tab-btn');
+                if (btn) {
+                    const tab = btn.dataset.tab;
+                    if (tab) {
+                        this.tabManagers.graph.switchTab(tab, e);
+                    }
                 }
             });
-        });
+        }
 
-        // Statistics tabs
-        document.querySelectorAll('#statisticsContainer .tab-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const tab = e.target.dataset.tab;
-                if (tab) {
-                    this.tabManagers.statistics.switchTab(tab, e);
+        // Use event delegation for statistics tabs
+        const statsContainer = document.getElementById('statisticsContainer');
+        if (statsContainer) {
+            statsContainer.addEventListener('click', (e) => {
+                const btn = e.target.closest('.tab-btn');
+                if (btn) {
+                    const tab = btn.dataset.tab;
+                    if (tab) {
+                        this.tabManagers.statistics.switchTab(tab, e);
+                    }
                 }
             });
-        });
+        }
     }
 
     setupFunctionButtons() {
@@ -495,15 +506,20 @@ class CalculatorApp {
         const tableBody = document.querySelector('#valueTable tbody');
         if (!tableBody) return;
 
-        tableBody.innerHTML = '';
+        // Use DocumentFragment to batch DOM operations and avoid repeated reflows
+        const fragment = document.createDocumentFragment();
         tableData.forEach(row => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${row.x.toFixed(4)}</td>
                 <td>${row.f1 !== undefined ? row.f1.toFixed(6) : 'undefined'}</td>
             `;
-            tableBody.appendChild(tr);
+            fragment.appendChild(tr);
         });
+
+        // Single DOM update
+        tableBody.innerHTML = '';
+        tableBody.appendChild(fragment);
     }
 
     /**

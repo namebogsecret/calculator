@@ -238,28 +238,35 @@ export class InputHandler {
     }
 
     setupButtonListeners() {
-        // Number buttons
-        document.querySelectorAll('.btn-number').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                this.handleInput(e.target.textContent);
-            });
-        });
+        // Use event delegation on calculator container for all button types
+        const calculatorContainer = document.querySelector('.calculator-buttons') ||
+                                   document.querySelector('.calculator-container') ||
+                                   document.body;
 
-        // Operator buttons
-        document.querySelectorAll('.btn-operator').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                this.handleInput(e.target.dataset.value || e.target.textContent);
-            });
-        });
+        calculatorContainer.addEventListener('click', (e) => {
+            const target = e.target.closest('button');
+            if (!target) return;
 
-        // Function buttons
-        document.querySelectorAll('.btn-function').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const func = e.target.dataset.function;
+            // Handle number buttons
+            if (target.classList.contains('btn-number')) {
+                this.handleInput(target.textContent);
+                return;
+            }
+
+            // Handle operator buttons
+            if (target.classList.contains('btn-operator')) {
+                this.handleInput(target.dataset.value || target.textContent);
+                return;
+            }
+
+            // Handle function buttons
+            if (target.classList.contains('btn-function')) {
+                const func = target.dataset.function;
                 if (func) {
                     this.handleFunction(func);
                 }
-            });
+                return;
+            }
         });
 
         // Special action buttons
@@ -420,9 +427,16 @@ export class DataListManager {
     updateListDisplay(listName) {
         const listElement = document.getElementById(`list${listName.slice(1)}`);
         if (listElement) {
-            listElement.innerHTML = this.lists[listName].map(value => 
-                `<div class="list-value">${formatNumber(value)}</div>`
-            ).join('');
+            // Use DocumentFragment for better performance
+            const fragment = document.createDocumentFragment();
+            this.lists[listName].forEach(value => {
+                const div = document.createElement('div');
+                div.className = 'list-value';
+                div.textContent = formatNumber(value);
+                fragment.appendChild(div);
+            });
+            listElement.innerHTML = '';
+            listElement.appendChild(fragment);
         }
     }
 

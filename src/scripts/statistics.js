@@ -148,34 +148,38 @@ export class DescriptiveStatistics {
     }
 
     /**
-     * Skewness and kurtosis
+     * Skewness and kurtosis - computed together in single pass for efficiency
      */
-    skewness() {
-        if (this.cache.skewness === undefined) {
+    _computeHigherMoments() {
+        if (this.cache.skewness === undefined || this.cache.kurtosis === undefined) {
             const n = this.data.length;
             const meanVal = this.mean();
             const stdDev = this.standardDeviation();
-            
-            const sumCubedDeviations = this.data.reduce((sum, val) => 
-                sum + Math.pow((val - meanVal) / stdDev, 3), 0);
-            
+
+            // Compute both skewness and kurtosis in single pass
+            let sumCubedDeviations = 0;
+            let sumFourthDeviations = 0;
+
+            for (let i = 0; i < n; i++) {
+                const normalized = (this.data[i] - meanVal) / stdDev;
+                const squared = normalized * normalized;
+                sumCubedDeviations += normalized * squared;
+                sumFourthDeviations += squared * squared;
+            }
+
             this.cache.skewness = (n / ((n - 1) * (n - 2))) * sumCubedDeviations;
+            this.cache.kurtosis = ((n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3))) * sumFourthDeviations -
+                                 (3 * (n - 1) * (n - 1)) / ((n - 2) * (n - 3));
         }
+    }
+
+    skewness() {
+        this._computeHigherMoments();
         return this.cache.skewness;
     }
 
     kurtosis() {
-        if (this.cache.kurtosis === undefined) {
-            const n = this.data.length;
-            const meanVal = this.mean();
-            const stdDev = this.standardDeviation();
-            
-            const sumFourthDeviations = this.data.reduce((sum, val) => 
-                sum + Math.pow((val - meanVal) / stdDev, 4), 0);
-            
-            this.cache.kurtosis = ((n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3))) * sumFourthDeviations - 
-                                 (3 * (n - 1) * (n - 1)) / ((n - 2) * (n - 3));
-        }
+        this._computeHigherMoments();
         return this.cache.kurtosis;
     }
 
@@ -524,19 +528,27 @@ export class StatisticsVisualizer {
         this.canvas.width = rect.width;
         this.canvas.height = rect.height;
 
-        const min = Math.min(...data);
-        const max = Math.max(...data);
+        // Single pass to find min and max (avoids stack overflow on large arrays)
+        let min = data[0];
+        let max = data[0];
+        for (let i = 1; i < data.length; i++) {
+            if (data[i] < min) min = data[i];
+            if (data[i] > max) max = data[i];
+        }
+
         const range = max - min;
         const binWidth = range / bins;
 
-        // Create bins
+        // Create bins and track maxCount in single pass
         const binCounts = Array(bins).fill(0);
-        data.forEach(value => {
-            const binIndex = Math.min(Math.floor((value - min) / binWidth), bins - 1);
+        let maxCount = 0;
+        for (let i = 0; i < data.length; i++) {
+            const binIndex = Math.min(Math.floor((data[i] - min) / binWidth), bins - 1);
             binCounts[binIndex]++;
-        });
-
-        const maxCount = Math.max(...binCounts);
+            if (binCounts[binIndex] > maxCount) {
+                maxCount = binCounts[binIndex];
+            }
+        }
 
         // Clear canvas
         this.ctx.fillStyle = '#000';
