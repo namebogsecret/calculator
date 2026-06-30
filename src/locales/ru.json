@@ -213,5 +213,9 @@
   "charts": {
     "histogram": "Гистограмма",
     "boxPlot": "Box Plot"
+  },
+  "buttons": {
+    "log2": "log₂",
+    "phi": "φ"
   }
 }

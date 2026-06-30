@@ -5,11 +5,13 @@
         <button class="btn btn-function" onclick="appendFunction('tan(')">tan</button>
         <button class="btn btn-function" onclick="appendFunction('log(')">log</button>
         <button class="btn btn-function" onclick="appendFunction('ln(')">ln</button>
+        <button class="btn btn-function" onclick="appendFunction('log2(')" data-i18n="buttons.log2">log₂</button>
         <button class="btn btn-function" onclick="appendFunction('sqrt(')">√</button>
         <button class="btn btn-function" onclick="appendFunction('^')">x^y</button>
         <button class="btn btn-function" onclick="appendFunction('abs(')">|x|</button>
-        <button class="btn btn-function" onclick="appendToDisplay('3.14159')">π</button>
-        <button class="btn btn-function" onclick="appendToDisplay('2.71828')">e</button>
+        <button class="btn btn-function" onclick="appendToDisplay('π')">π</button>
+        <button class="btn btn-function" onclick="appendToDisplay('e')">e</button>
+        <button class="btn btn-function" onclick="appendToDisplay('φ')" data-i18n="buttons.phi">φ</button>
         <button class="btn btn-function" onclick="appendFunction('asin(')">asin</button>
         <button class="btn btn-function" onclick="appendFunction('acos(')">acos</button>
         <button class="btn btn-function" onclick="appendFunction('atan(')">atan</button>
@@ -29,13 +31,13 @@
     <div class="buttons">
         <button class="btn btn-clear" onclick="clearDisplay()">C</button>
         <button class="btn btn-function" onclick="deleteLastChar()">⌫</button>
-        <button class="btn btn-function" onclick="appendToDisplay('/')">/</button>
-        <button class="btn btn-operator" onclick="appendToDisplay('*')">×</button>
+        <button class="btn btn-operator" onclick="appendToDisplay('÷')">÷</button>
+        <button class="btn btn-operator" onclick="appendToDisplay('×')">×</button>
         
         <button class="btn btn-number" onclick="appendToDisplay('7')">7</button>
         <button class="btn btn-number" onclick="appendToDisplay('8')">8</button>
         <button class="btn btn-number" onclick="appendToDisplay('9')">9</button>
-        <button class="btn btn-operator" onclick="appendToDisplay('-')">−</button>
+        <button class="btn btn-operator" onclick="appendToDisplay('−')">−</button>
         
         <button class="btn btn-number" onclick="appendToDisplay('4')">4</button>
         <button class="btn btn-number" onclick="appendToDisplay('5')">5</button>

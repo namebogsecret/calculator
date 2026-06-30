@@ -367,9 +367,11 @@ export class GraphRenderer {
         const x = (this.mouseX - centerX) / this.scale;
         const y = -(this.mouseY - centerY) / this.scale;
         
-        // Redraw graph
-        this.redraw();
-        
+        // Redraw graph synchronously — using the async redraw() here would let a
+        // queued requestAnimationFrame repaint the graph AFTER the crosshair is
+        // drawn, erasing it before the user ever sees it.
+        this.redrawImmediate();
+
         // Draw crosshair
         this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
         this.ctx.lineWidth = 1;
@@ -603,8 +605,13 @@ export class FunctionTable {
         }
 
         const table = [];
-        
-        for (let x = start; x <= end; x += step) {
+
+        // Index-based iteration to avoid floating-point accumulation dropping the
+        // final row (e.g. start=0, end=0.3, step=0.1 -> last x = 0.30000000000000004 > 0.3).
+        const count = Math.round((end - start) / step) + 1;
+        for (let i = 0; i < count; i++) {
+            const x = start + i * step;
+            if (x > end + Math.abs(step) * 1e-9) break;
             const row = { x: x };
             
             this.functions.forEach((func, index) => {

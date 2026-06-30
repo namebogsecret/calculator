@@ -1,13 +1,16 @@
 <div class="graph-container" id="graphContainer">
     <div class="graph-tabs">
-        <button class="tab-btn active" onclick="switchGraphTab('function')" data-i18n="graph.tabs.functions">Functions</button>
-        <button class="tab-btn" onclick="switchGraphTab('table')" data-i18n="graph.tabs.table">Table</button>
-        <button class="tab-btn" onclick="switchGraphTab('regression')" data-i18n="graph.tabs.regression">Regression</button>
-        <button class="tab-btn" onclick="switchGraphTab('trace')" data-i18n="graph.tabs.trace">Trace</button>
+        <button class="tab-btn active" onclick="switchGraphTab('function')" data-tab="function" data-i18n="graph.tabs.functions">Functions</button>
+        <button class="tab-btn" onclick="switchGraphTab('table')" data-tab="table" data-i18n="graph.tabs.table">Table</button>
+        <button class="tab-btn" onclick="switchGraphTab('regression')" data-tab="regression" data-i18n="graph.tabs.regression">Regression</button>
+        <button class="tab-btn" onclick="switchGraphTab('trace')" data-tab="trace" data-i18n="graph.tabs.trace">Trace</button>
     </div>
 
+    <!-- Canvas sits outside the tab panels so it stays visible (and receives
+         mouse events for Trace) regardless of which tab is active. -->
+    <canvas id="graph-canvas"></canvas>
+
     <div class="tab-content active" id="function-tab">
-        <canvas id="graph-canvas"></canvas>
         <div class="graph-controls">
             <input type="text" class="graph-input" id="functionInput" data-i18n-placeholder="graph.placeholder" placeholder="y = sin(x), x^2, 2*x+1">
             <button class="graph-btn" onclick="plotGraph()" data-i18n="common.plot">Plot</button>

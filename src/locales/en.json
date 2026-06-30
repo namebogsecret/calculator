@@ -64,21 +64,21 @@
     "scatterPlot": "Scatter Plot",
     "labels": {
       "count": "n (Count):",
-      "mean": "x\u0304 (Mean):",
-      "sumX": "\u03a3x:",
-      "sumXSq": "\u03a3x\u00b2:",
+      "mean": "x̄ (Mean):",
+      "sumX": "Σx:",
+      "sumXSq": "Σx²:",
       "stdDev": "s (Std. Dev.):",
-      "popStdDev": "\u03c3 (Pop. Std. Dev.):",
+      "popStdDev": "σ (Pop. Std. Dev.):",
       "minimum": "Minimum:",
-      "q1": "Q\u2081:",
+      "q1": "Q₁:",
       "median": "Median:",
-      "q3": "Q\u2083:",
+      "q3": "Q₃:",
       "maximum": "Maximum:",
       "iqr": "IQR:",
       "n": "n:",
-      "meanX": "x\u0304:",
-      "meanY": "y\u0304:",
-      "sumXY": "\u03a3xy:",
+      "meanX": "x̄:",
+      "meanY": "ȳ:",
+      "sumXY": "Σxy:",
       "correlation": "r (correlation):",
       "regressionLine": "Regression line:"
     },
@@ -89,27 +89,27 @@
       "exponential": "Exponential",
       "uniform": "Uniform",
       "parameters": "Parameters:",
-      "normalHelp": "Normal: \u03bc (mean), \u03c3 (std. dev.)",
+      "normalHelp": "Normal: μ (mean), σ (std. dev.)",
       "binomialHelp": "Binomial: n (trials), p (probability)",
-      "poissonHelp": "Poisson: \u03bb (mean number of events)",
-      "exponentialHelp": "Exponential: \u03bb (rate)",
+      "poissonHelp": "Poisson: λ (mean number of events)",
+      "exponentialHelp": "Exponential: λ (rate)",
       "uniformHelp": "Uniform: a (min), b (max)",
       "expectedValue": "Expected value:",
       "variance": "Variance:"
     },
     "tests": {
       "dataFormat": "Data format:",
-      "ttestHelp": "T-Test: numbers separated by comma (test against \u03bc\u2080=0)",
-      "ztestHelp": "Z-Test: numbers separated by comma (test against \u03bc\u2080=0)",
-      "chi2Help": "\u03c7\u00b2 Test: observed values (1 line) or obs./exp. (2 lines)",
+      "ttestHelp": "T-Test: numbers separated by comma (test against μ₀=0)",
+      "ztestHelp": "Z-Test: numbers separated by comma (test against μ₀=0)",
+      "chi2Help": "χ² Test: observed values (1 line) or obs./exp. (2 lines)",
       "anovaHelp": "ANOVA: each group on new line",
       "performTest": "Perform test",
       "statistic": "Statistic:",
       "pValue": "p-value:",
       "conclusion": "Conclusion:",
       "inputPlaceholder": "Enter numbers separated by comma: 1, 2, 3, 4, 5",
-      "rejectH0": "Reject H\u2080 (p < 0.05)",
-      "failRejectH0": "Fail to reject H\u2080 (p \u2265 0.05)"
+      "rejectH0": "Reject H₀ (p < 0.05)",
+      "failRejectH0": "Fail to reject H₀ (p ≥ 0.05)"
     }
   },
   "matrix": {
@@ -161,7 +161,7 @@
     "errors": {
       "sameSizeAdd": "Matrices must have same size for addition",
       "sameSizeSubtract": "Matrices must have same size for subtraction",
-      "cannotMultiply": "Cannot multiply: {rows1}\u00d7{cols1} by {rows2}\u00d7{cols2}",
+      "cannotMultiply": "Cannot multiply: {rows1}×{cols1} by {rows2}×{cols2}",
       "detSquare": "Determinant exists only for square matrices",
       "invSquare": "Inverse exists only for square matrices",
       "singularMatrix": "Matrix is singular (det = 0), inverse does not exist",
@@ -169,7 +169,7 @@
       "eigenSquare": "Eigenvalues exist only for square matrices",
       "noInverse": "Inverse matrix does not exist (det = 0)",
       "inverseFound": "Inverse matrix found",
-      "usePowerMethod": "Use numerical methods for matrices > 3\u00d73"
+      "usePowerMethod": "Use numerical methods for matrices > 3×3"
     }
   },
   "notifications": {
@@ -213,5 +213,9 @@
   "charts": {
     "histogram": "Histogram",
     "boxPlot": "Box Plot"
+  },
+  "buttons": {
+    "log2": "log₂",
+    "phi": "φ"
   }
 }

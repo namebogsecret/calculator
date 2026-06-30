@@ -72,6 +72,7 @@ const FUNCTION_REPLACEMENTS = {
     'sin': 'Math.sin',
     'cos': 'Math.cos',
     'tan': 'Math.tan',
+    'log2': 'Math.log2',
     'log': 'Math.log10',
     'ln': 'Math.log',
     'sqrt': 'Math.sqrt',
@@ -113,18 +114,39 @@ export function prepareExpression(expr, angleMode = 'deg') {
     // Handle 'e' separately to avoid replacing 'e' in other words
     prepared = prepared.replace(/\be\b/g, 'Math.E');
 
+    // Mathematical constant symbols inserted by buttons
+    prepared = prepared.replace(/π/g, 'Math.PI');
+    prepared = prepared.replace(/φ/g, '((1 + Math.sqrt(5)) / 2)');
+
     // Operator replacements in single pass
     prepared = prepared.replace(OPERATOR_PATTERN, (match) => OPERATOR_REPLACEMENTS[match] || match);
 
-    // Handle factorial
-    prepared = prepared.replace(/(\d+)!/g, (match, num) => factorial(parseInt(num)));
+    // Repair unary minus directly before exponentiation: JS forbids `-3**2`.
+    // Rewrite to `-(3**2)` so it evaluates with the mathematical convention -3^2 = -9.
+    {
+        const POW_OPERAND = '(\\d+\\.?\\d*|Math\\.[A-Za-z]+|\\([^()]*\\))';
+        const unaryPow = new RegExp(`(^|[(+\\-*/%,=])\\s*-\\s*${POW_OPERAND}\\s*\\*\\*\\s*${POW_OPERAND}`, 'g');
+        let prev;
+        do {
+            prev = prepared;
+            prepared = prepared.replace(unaryPow, (m, pre, base, exp) => `${pre}-(${base}**${exp})`);
+        } while (prepared !== prev);
+    }
+
+    // Handle factorial — only for bare non-negative integers (e.g. 5!), so that
+    // 5.5! / (2+3)! surface as an error instead of silently mis-evaluating.
+    prepared = prepared.replace(/(?<![\d.])(\d+)!/g, (match, num) => factorial(parseInt(num)));
 
     // Convert angles for trigonometric functions
     if (angleMode === 'deg') {
         prepared = prepared
             .replace(/Math\.sin\(([^)]+)\)/g, (match, angle) => `Math.sin((${angle}) * Math.PI / 180)`)
             .replace(/Math\.cos\(([^)]+)\)/g, (match, angle) => `Math.cos((${angle}) * Math.PI / 180)`)
-            .replace(/Math\.tan\(([^)]+)\)/g, (match, angle) => `Math.tan((${angle}) * Math.PI / 180)`);
+            .replace(/Math\.tan\(([^)]+)\)/g, (match, angle) => `Math.tan((${angle}) * Math.PI / 180)`)
+            // Inverse trig must return degrees in DEG mode
+            .replace(/Math\.asin\(([^)]+)\)/g, (match, v) => `(Math.asin(${v}) * 180 / Math.PI)`)
+            .replace(/Math\.acos\(([^)]+)\)/g, (match, v) => `(Math.acos(${v}) * 180 / Math.PI)`)
+            .replace(/Math\.atan\(([^)]+)\)/g, (match, v) => `(Math.atan(${v}) * 180 / Math.PI)`);
     }
 
     // Manage cache size
@@ -154,6 +176,10 @@ export function prepareFunctionExpression(funcStr) {
 
     // Handle 'e' separately
     prepared = prepared.replace(/\be\b/g, 'Math.E');
+
+    // Mathematical constant symbols
+    prepared = prepared.replace(/π/g, 'Math.PI');
+    prepared = prepared.replace(/φ/g, '((1 + Math.sqrt(5)) / 2)');
 
     // Operator replacement
     prepared = prepared.replace(OPERATOR_PATTERN, (match) => OPERATOR_REPLACEMENTS[match] || match);

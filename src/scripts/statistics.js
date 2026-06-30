@@ -301,6 +301,9 @@ export class RegressionAnalysis {
      * Exponential regression: y = ae^(bx)
      */
     exponentialRegression(x, y) {
+        if (y.some(yi => yi <= 0)) {
+            throw new Error('Exponential regression requires all y values to be positive');
+        }
         // Transform to linear: ln(y) = ln(a) + bx
         const lnY = y.map(yi => Math.log(yi));
         const linear = this.linearRegression(x, lnY);
@@ -330,6 +333,9 @@ export class RegressionAnalysis {
      * Logarithmic regression: y = a * ln(x) + b
      */
     logarithmicRegression(x, y) {
+        if (x.some(xi => xi <= 0)) {
+            throw new Error('Logarithmic regression requires all x values to be positive');
+        }
         const lnX = x.map(xi => Math.log(xi));
         const linear = this.linearRegression(lnX, y);
         
@@ -346,6 +352,9 @@ export class RegressionAnalysis {
      * Power regression: y = ax^b
      */
     powerRegression(x, y) {
+        if (x.some(xi => xi <= 0) || y.some(yi => yi <= 0)) {
+            throw new Error('Power regression requires all x and y values to be positive');
+        }
         // Transform to linear: ln(y) = ln(a) + b*ln(x)
         const lnX = x.map(xi => Math.log(xi));
         const lnY = y.map(yi => Math.log(yi));

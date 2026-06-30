@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="src/styles/responsive.css">
 </head>
 <body>
-    <div class="calculator-container">
+    <div class="calculator-container" id="calculator">
         <!-- Mode Selector -->
         <div id="mode-selector-container"></div>
         
@@ -1671,7 +1671,7 @@
                             document.getElementById('eigenPoly').textContent = polyStr;
 
                             const eigenvalues = solveCubicEigen(-trace, c, -det);
-                            const eigenStr = eigenvalues.map((e, i) => `λ${i + 1} = ${e.toFixed(6)}`).join(', ');
+                            const eigenStr = eigenvalues.map((e, i) => `λ${i + 1} = ${typeof e === 'number' ? e.toFixed(6) : e}`).join(', ');
                             document.getElementById('eigenValues').textContent = eigenStr;
                         } else {
                             document.getElementById('eigenValues').textContent = 'Используйте численные методы для матриц > 3×3';
@@ -1696,7 +1696,11 @@
                         const sqrtD = Math.sqrt(D);
                         const u = Math.cbrt(-q / 2 + sqrtD);
                         const v = Math.cbrt(-q / 2 - sqrtD);
-                        roots.push(u + v - a / 3);
+                        roots.push(u + v - a / 3);                 // one real root
+                        const re = -(u + v) / 2 - a / 3;           // complex conjugate pair
+                        const im = Math.abs(u - v) * Math.sqrt(3) / 2;
+                        roots.push(`${re.toFixed(6)} + ${im.toFixed(6)}i`);
+                        roots.push(`${re.toFixed(6)} - ${im.toFixed(6)}i`);
                     } else if (D < -1e-10) {
                         const r = Math.sqrt(-p * p * p / 27);
                         const theta = Math.acos(-q / (2 * r));
@@ -1707,14 +1711,17 @@
                         roots.push(2 * cubeRootR * Math.cos((theta + 4 * Math.PI) / 3) - a / 3);
                     } else {
                         if (Math.abs(q) < 1e-10) {
-                            roots.push(-a / 3);
+                            roots.push(-a / 3, -a / 3, -a / 3);    // triple root
                         } else {
                             roots.push(3 * q / p - a / 3);
-                            roots.push(-3 * q / (2 * p) - a / 3);
+                            const dbl = -3 * q / (2 * p) - a / 3;  // double root (multiplicity 2)
+                            roots.push(dbl, dbl);
                         }
                     }
 
-                    return roots.map(r => Math.abs(r) < 1e-10 ? 0 : r).sort((x, y) => y - x);
+                    return roots
+                        .map(r => (typeof r === 'number' && Math.abs(r) < 1e-10) ? 0 : r)
+                        .sort((x, y) => (typeof x === 'number' && typeof y === 'number') ? y - x : 0);
                 }
 
                 // System of linear equations tab functions

@@ -238,38 +238,12 @@ export class InputHandler {
     }
 
     setupButtonListeners() {
-        // Use event delegation on calculator container for all button types
-        const calculatorContainer = document.querySelector('.calculator-buttons') ||
-                                   document.querySelector('.calculator-container') ||
-                                   document.body;
-
-        calculatorContainer.addEventListener('click', (e) => {
-            const target = e.target.closest('button');
-            if (!target) return;
-
-            // Handle number buttons
-            if (target.classList.contains('btn-number')) {
-                this.handleInput(target.textContent);
-                return;
-            }
-
-            // Handle operator buttons
-            if (target.classList.contains('btn-operator')) {
-                this.handleInput(target.dataset.value || target.textContent);
-                return;
-            }
-
-            // Handle function buttons
-            if (target.classList.contains('btn-function')) {
-                const func = target.dataset.function;
-                if (func) {
-                    this.handleFunction(func);
-                }
-                return;
-            }
-        });
-
-        // Special action buttons
+        // NOTE: On-screen buttons are wired via inline onclick handlers
+        // (window.appendToDisplay / appendFunction / calculate / etc. defined in
+        // index.html). A click-delegation listener used to live here too, which
+        // double-processed every press (e.g. "7" -> "77", "×" -> "*×"). Removed.
+        // Keyboard input is still handled by setupKeyboardListeners().
+        // Special action buttons remain id-bound for any markup that uses ids.
         this.setupSpecialButtons();
     }
 

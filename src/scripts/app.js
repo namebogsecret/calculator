@@ -4,7 +4,6 @@
 
 // Import all modules
 import { createCalculator } from './calculator.js';
-import { TrigonometricFunctions, LogarithmicFunctions, ProbabilityDistributions, StatisticalTests, FinancialFunctions } from './scientific.js';
 import { createGraphRenderer, createFunctionTable } from './graphing.js';
 import { createDescriptiveStatistics, createRegressionAnalysis, createTwoVariableStatistics, createStatisticsVisualizer } from './statistics.js';
 import { 
@@ -633,23 +632,12 @@ class CalculatorApp {
 }
 
 /**
- * Global application instance
- */
-let calculatorApp = null;
-
-/**
- * Initialize the application when DOM is ready
- */
-document.addEventListener('DOMContentLoaded', async () => {
-    calculatorApp = new CalculatorApp();
-    await calculatorApp.init();
-    
-    // Make app globally accessible for debugging
-    window.calculatorApp = calculatorApp;
-});
-
-/**
+ * NOTE: The application is instantiated exactly once, from index.html's
+ * DOMContentLoaded handler, AFTER the HTML component fragments are injected.
+ * A second module-level init used to run here before components were loaded,
+ * creating a duplicate CalculatorApp whose listeners fired on every click
+ * (causing doubled input like "77" and a null-element TypeError). Removed.
+ *
  * Export for use in other modules
  */
 export default CalculatorApp;
-export { calculatorApp };
