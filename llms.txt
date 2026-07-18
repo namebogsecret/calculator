@@ -1,0 +1,7 @@
+# Advanced Graphing Calculator
+> Free online scientific and graphing calculator by Vladimir Podlevskikh (physics & maths tutor, MSU).
+> Vanilla JS, no install. Modes: basic, scientific, function graphing y=f(x) (zoom/pan/trace, regressions), statistics (descriptive, t/z/chi-square tests, distributions), matrices (determinant, inverse LU, transpose). Languages: EN/RU.
+
+- App: https://graph.podlevskikh.com/
+- Author & tutoring: https://tutor.podlevskikh.com/
+- Related: https://calculators.podlevskikh.com/ (100+ calculators), https://calc.podlevskikh.com/ (ЕГЭ score calculator)
