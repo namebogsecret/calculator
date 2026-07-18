@@ -25,7 +25,8 @@ export class DisplayManager {
 
     updateResult(result, formatted = null) {
         this.currentResult = result;
-        this.resultElement.textContent = formatted || formatNumber(result);
+        // preview paths pass an already-formatted string — re-formatting a string yields 'Error'
+        this.resultElement.textContent = formatted || (typeof result === 'number' ? formatNumber(result) : result);
         this.isError = false;
     }
 
