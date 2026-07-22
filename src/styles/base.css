@@ -10,13 +10,58 @@ body {
     background: var(--dark);
     min-height: 100vh;
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    /* Column: calculator on top, footer below. Row layout squeezed the
+       calculator into a sliver on narrow screens — footer and the toast
+       container are body-level siblings and were stealing the row's width. */
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
     padding: 15px;
     color: var(--text);
     position: relative;
     overflow-x: hidden;
     overflow-y: auto;
+}
+
+/* Direct flex children must not be squashed vertically when content overflows */
+body > .calculator-container,
+body > footer {
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 820px;
+}
+
+/* Toasts live outside the flow — otherwise they become body flex items
+   and steal layout space from the calculator. */
+.notification-container {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+    max-width: min(320px, calc(100vw - 32px));
+}
+
+.notification-container .notification {
+    pointer-events: auto;
+    background: var(--dark-lighter, #1a1a2e);
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: var(--text, #fff);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.notification-container .notification.show {
+    opacity: 1;
+    transform: translateX(0);
 }
 
 body::before {

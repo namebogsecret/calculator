@@ -53,4 +53,24 @@
         font-size: 12px;
         padding: 6px 12px;
     }
+
+    /* Toasts go to the bottom on phones — at the top they cover the mode row */
+    .notification-container {
+        top: auto;
+        bottom: 16px;
+        left: 12px;
+        right: 12px;
+        max-width: none;
+        align-items: stretch;
+    }
+
+    /* Slide up from the bottom instead of in from the right (which overflowed) */
+    .notification-container .notification {
+        text-align: center;
+        transform: translateY(20px);
+    }
+
+    .notification-container .notification.show {
+        transform: translateY(0);
+    }
 }
